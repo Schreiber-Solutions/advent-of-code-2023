@@ -9,16 +9,13 @@ def find_number(input):
     list = ['0','1','2','3','4','5','6','7','8','9','zero','one','two','three','four','five','six','seven','eight','nine']
     v = [0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9]
 
-    first_where = len(input)
-
     for c in list:
         if c in input:
             where = input.index(c)
-            if where < first_where:
-                num = v[list.index(c)]
-                first_where = where
+            num = v[list.index(c)]
 
     return num
+
 
 def part2(input):
     with open(input) as f:
@@ -27,16 +24,21 @@ def part2(input):
     total = 0
     for l in input_lines:
         num = ""
-        num = num + str(find_number(l))
 
         for i in range(len(l)):
-            if find_number(l[len(l)-i-1:]) >= 0:
-                num = num + str(find_number(l[len(l)-i-1:]))
+            if find_number(l[:i+1]) >= 0:
+                num = num + str(find_number(l[:i+1]))
+                break
+
+        for i in range(len(l),0,-1):
+            if find_number(l[i-1:]) >= 0:
+                num = num + str(find_number(l[i-1:]))
                 break
 
         total = total + int(num)
 
     return total
+
 
 def part1(input):
     with open(input) as f:
