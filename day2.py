@@ -53,10 +53,7 @@ def part1(input):
 
             for color in max_colors.keys():
                 if color in color_combo_collection.keys() and color_combo_collection[color] > max_colors[color]:
-                    print("imposssible {}".format(r))
                     possible = False
-                else:
-                    print("possible {}".format(r))
 
         if possible:
             total = total + game_id
