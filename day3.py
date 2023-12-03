@@ -18,16 +18,7 @@ def part2(input):
 
     total = 0
 
-    row = 0
-    max_rows = len(input_lines)
-    grid = {}
-    max_cols = len(input_lines[0])
-    for l in input_lines:
-        col = 0
-        for c in l:
-            grid[(row,col)] = c
-            col = col + 1
-        row = row + 1
+    grid, max_cols, max_rows = create_grid(input_lines)
 
     gears = {}
 
@@ -67,11 +58,27 @@ def part2(input):
 
     return total
 
+
+def create_grid(input_lines):
+    row = 0
+    max_rows = len(input_lines)
+    grid = {}
+    max_cols = len(input_lines[0])
+    for l in input_lines:
+        col = 0
+        for c in l:
+            grid[(row, col)] = c
+            col = col + 1
+        row = row + 1
+    return grid, max_cols, max_rows
+
+
 def get_item(g,row,col):
     if (row,col) in g.keys():
         return g[(row,col)]
     else:
         return "."
+
 
 def is_symbol_adjacent(g,row,col):
     for r_o in [-1,0,1]:
@@ -87,17 +94,7 @@ def part1(input):
         input_lines = f.read().splitlines()
 
     total = 0
-    row = 0
-    max_rows = len(input_lines)
-    grid = {}
-    max_cols = len(input_lines[0])
-    for l in input_lines:
-        col = 0
-        for c in l:
-            grid[(row,col)] = c
-            col = col + 1
-        row = row + 1
-
+    grid, max_cols, max_rows = create_grid(input_lines)
 
     for row in range(max_rows):
         num = ""
@@ -118,6 +115,7 @@ def part1(input):
 
 
     return total
+
 
 if __name__ == '__main__':
     d = scrib.find_filename(__file__)
