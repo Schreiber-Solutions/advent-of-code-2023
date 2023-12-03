@@ -43,7 +43,7 @@ def part2(input):
                         gears[location] = [num]
 
                     # print("found gear at {}".format(location))
-
+                location = (-1,-1)
                 num = ""
                 is_symbol = False
 
@@ -51,8 +51,10 @@ def part2(input):
         if len(gears[g]) > 1:
             # print("location {} has {}".format(g,gears[g]))
             num = 1
+            
             for n in gears[g]:
                 num = num * int(n)
+
 
             total = total + num
 
