@@ -17,10 +17,7 @@ def part2(input):
         winners = [int(n) for n in a.split(": ")[1].split()]
         my_numbers = [int(n) for n in b.split()]
 
-        points = 0
-        for w in winners:
-            if w in my_numbers:
-                points = points + 1
+        points = sum([1 for w in winners if w in my_numbers])
 
         for p in range(points):
             cards[card+p] = cards[card+p] + cards[card-1]
@@ -39,13 +36,9 @@ def part1(input):
         winners = [int(n) for n in a.split(": ")[1].split()]
         my_numbers = [int(n) for n in b.split()]
 
-        points = 0
-        for w in winners:
-            if w in my_numbers:
-                if points == 0:
-                    points = 1
-                else:
-                    points = points * 2
+        points = sum([1 for w in winners if w in my_numbers])
+        if points > 0:
+            points = 2**(points-1)
 
         total = total + points
 
@@ -58,7 +51,9 @@ if __name__ == '__main__':
 
     input_file = "./data/" + d + "_input.txt"
     print("{} part 1: {}".format(d,part1(input_file)))
+    assert(part1(input_file)==20107)
     print("{} part 2: {}".format(d,part2(input_file)))
+    assert(part2(input_file)==8172507)
     # print("day 8 part 1: {}".format(part1("./data/day10_test.txt")))
 
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
