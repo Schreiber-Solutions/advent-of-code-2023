@@ -25,15 +25,8 @@ def part2(input):
     for l in input_lines:
         num = ""
 
-        for i in range(len(l)):
-            if find_number(l[:i+1]) >= 0:
-                num = num + str(find_number(l[:i+1]))
-                break
-
-        for i in range(len(l),0,-1):
-            if find_number(l[i-1:]) >= 0:
-                num = num + str(find_number(l[i-1:]))
-                break
+        num = str([find_number(l[:i+1]) for i in range(len(l)) if find_number(l[:i+1]) >= 0][0])
+        num = num + str([find_number(l[i-1:]) for i in range(len(l),0,-1) if find_number(l[i-1:]) >= 0][0])
 
         total = total + int(num)
 
@@ -44,21 +37,7 @@ def part1(input):
     with open(input) as f:
         input_lines = f.read().splitlines()
 
-    total = 0
-    for l in input_lines:
-        num = ""
-        for c in l:
-
-            if c in ['0','1','2','3','4','5','6','7','8','9']:
-                num = num + c
-                break
-
-        for c in reversed(l):
-            if c in ['0','1','2','3','4','5','6','7','8','9']:
-                num = num + c
-                break
-
-        total = total + int(num)
+    total = sum([int([c for c in l if c.isnumeric()][0] + [c for c in l if c.isnumeric()][-1]) for l in input_lines])
 
     return total
 
@@ -68,7 +47,9 @@ if __name__ == '__main__':
 
     input_file = "./data/" + d + "_input.txt"
     print("{} part 1: {}".format(d,part1(input_file)))
+    assert(part1(input_file)==55538)
     print("{} part 2: {}".format(d,part2(input_file)))
+    assert(part2(input_file)==54875)
     # print("day 8 part 1: {}".format(part1("./data/day10_test.txt")))
 
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
