@@ -3,13 +3,29 @@ import scrib
 import os
 from collections import namedtuple
 
+
 def part2(input):
     with open(input) as f:
         input_lines = f.read().splitlines()
 
     total = 0
+    cards = [1 for i in range(len(input_lines))]
 
-    return total
+    for l in input_lines:
+        (a,b) = l.split(" | ")
+        card = scrib.find_int(a.split(": ")[0])
+        winners = [int(n) for n in a.split(": ")[1].split()]
+        my_numbers = [int(n) for n in b.split()]
+
+        points = 0
+        for w in winners:
+            if w in my_numbers:
+                points = points + 1
+
+        for p in range(points):
+            cards[card+p] = cards[card+p] + cards[card-1]
+
+    return sum(cards)
 
 
 def part1(input):
@@ -18,7 +34,23 @@ def part1(input):
 
     total = 0
 
+    for l in input_lines:
+        (a,b) = l.split(" | ")
+        winners = [int(n) for n in a.split(": ")[1].split()]
+        my_numbers = [int(n) for n in b.split()]
+
+        points = 0
+        for w in winners:
+            if w in my_numbers:
+                if points == 0:
+                    points = 1
+                else:
+                    points = points * 2
+
+        total = total + points
+
     return total
+
 
 if __name__ == '__main__':
     d = scrib.find_filename(__file__)
