@@ -36,18 +36,13 @@ def part2_v2(input):
         input_lines = f.read().splitlines()
 
     seeds = [int(n) for n in input_lines[0].split()[1:]]
-
     lowest_location, maps = load_file(input_lines)
-
-    total =0
-
-    count = 0
-    location_map = {}
 
     location_starts = [maps[len(maps)-1][i][0] for i in range(len(maps[len(maps)-1]))]
     location_starts.sort()
+    location_starts.append(lowest_location)
 
-    for each_range in range(len(location_starts)):
+    for each_range in range(len(location_starts)-1):
         num = check_range(maps,seeds,location_starts[each_range], location_starts[each_range+1])
 
         if num > 0:
@@ -99,13 +94,10 @@ def part1(input):
     lowest_location, maps = load_file(input_lines)
 
     for s in seeds:
-        num = s
-        num = seed_to_location(maps, num)
+        num = seed_to_location(maps, s)
 
         if num < lowest_location:
             lowest_location = num
-
-        # print("seed {} to location {}".format(s,num))
 
     return lowest_location
 
@@ -130,6 +122,7 @@ if __name__ == '__main__':
     input_file = "./data/" + d + "_input.txt"
     start = timer()
     print("{} part 1: {} in {} seconds".format(d,part1(input_file),timer()-start))
+    assert(part1(input_file)==111627841)
 
     start = timer()
     print("{} part 2: {} in {} seconds".format(d,part2_v2(input_file),timer()-start))
