@@ -70,7 +70,7 @@ def check_range(maps, seeds, start, end):
                 if step == 1:
                     return location
                 else:
-                    return check_range(maps, seeds, location-step,location)
+                    return check_range(maps, seeds, location-step,location+1)
 
     return -1
 
