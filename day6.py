@@ -25,13 +25,10 @@ def solve(time,distance):
     num1 = (time - math.sqrt(time ** 2 - 4 * distance)) / 2
     num2 = (time + math.sqrt(time ** 2 - 4 * distance)) / 2
 
-    # print(num1,num2)
     # print([hold_time for hold_time in range(time + 1) if hold_time * (time - hold_time) > distance])
-    # print([hold_time for hold_time in range(math.floor(num1), math.ceil(num2) + 1) if hold_time * (time - hold_time) > distance])
     # won = sum([1 for hold_time in range(time + 1) if hold_time * (time - hold_time) > distance])
 
-    won = sum([1 for hold_time in range(math.floor(num1),math.ceil(num2)+1) if hold_time * (time - hold_time) > distance])
-    # won = sum([1 for hold_time in range(time+1) if hold_time * (time - hold_time) > distance])
+    won = math.ceil(num2)-math.floor(num1)-1
 
     return won
 
