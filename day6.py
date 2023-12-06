@@ -15,20 +15,10 @@ def part2(input):
     time = int("".join([n for n in input_lines[0].split(":")[1].split()]))
     distance = int("".join([n for n in input_lines[1].split(":")[1].split()]))
 
-    total = 1
-
     t = time
-    won = 0
-    for hold_time in range(t+1):
-        traveled = hold_time*(t-hold_time)
-        if traveled > distance:
-            won = won + 1
+    won = sum([1 for hold_time in range(t+1) if hold_time*(t-hold_time) > distance])
 
-        # if hold_time/100000 == int(hold_time/100000):
-        #     print("at hold time {}".format(hold_time))
-    total = total * won
-
-    return total
+    return won
 
 
 def part1(input):
@@ -40,7 +30,6 @@ def part1(input):
     times = [int(n) for n in input_lines[0].split(":")[1].split()]
     distances = [int(n) for n in input_lines[1].split(":")[1].split()]
 
-    print(times)
     total = 1
     for index in range(len(times)):
         t = times[index]
@@ -49,7 +38,6 @@ def part1(input):
             traveled = hold_time*(t-hold_time)
             if traveled > distances[index]:
                 won = won + 1
-        print("{} wins {} times".format(index,won))
         total = total * won
 
     return total
@@ -60,8 +48,9 @@ if __name__ == '__main__':
 
     input_file = "./data/" + d + "_input.txt"
     print("{} part 1: {}".format(d,part1(input_file)))
-    print("{} part 2: {}".format(d,part2(input_file)))
-    # print("day 8 part 1: {}".format(part1("./data/day10_test.txt")))
+    result = part2(input_file)
+    assert(result==33875953)
+    print("{} part 2: {}".format(d,result))
 
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
     # print(scrib.find_most_frequent(lst))
