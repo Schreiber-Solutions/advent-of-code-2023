@@ -1,3 +1,4 @@
+import math
 import re
 import scrib
 import os
@@ -17,7 +18,8 @@ def part2(input):
 
     t = time
     won = sum([1 for hold_time in range(t+1) if hold_time*(t-hold_time) > distance])
-
+    # print((distance+math.sqrt(t**2-4*distance))/2-(distance-math.sqrt(t**2-4*distance))/2)
+    # won = int((distance+math.sqrt(t**2-4*distance))/2-(distance-math.sqrt(t**2-4*distance))/2)
     return won
 
 
@@ -33,11 +35,14 @@ def part1(input):
     total = 1
     for index in range(len(times)):
         t = times[index]
+        distance = distances[index]
         won = 0
         for hold_time in range(t+1):
             traveled = hold_time*(t-hold_time)
-            if traveled > distances[index]:
+            if traveled > distance:
                 won = won + 1
+
+        # print(won,(distance + math.sqrt(t ** 2 - 4 * distance)) / 2 - (distance - math.sqrt(t ** 2 - 4 * distance)) / 2)
         total = total * won
 
     return total
