@@ -2,6 +2,8 @@ import re
 import scrib
 import os
 from collections import namedtuple
+from math import lcm
+
 
 def part2(input):
     with open(input) as f:
@@ -9,10 +11,10 @@ def part2(input):
 
     total = 0
     map = {}
-    for index in range(2,len(input_lines)):
+    for index in range(2, len(input_lines)):
         l = input_lines[index]
-        a,b,c = re.findall(r"\w{3}",l)
-        map[a] = [b,c]
+        a, b, c = re.findall(r"\w{3}", l)
+        map[a] = [b, c]
 
     instructions = input_lines[0]
 
@@ -33,15 +35,7 @@ def part2(input):
             if len(next_node) == (len([n for n in next_node if n[-1] == "Z"])):
                 return total
 
-    factors = []
-    [factors.extend(get_prime_factors(w)) for w in which.values()]
-    factors = list(set(factors))
-
-    total = 1
-    for f in factors:
-        total = total * f
-
-    return total
+    return lcm(*list(which.values()))
 
 
 def get_prime_factors(n):
@@ -67,10 +61,10 @@ def part1(input):
     total = 0
 
     map = {}
-    for index in range(2,len(input_lines)):
+    for index in range(2, len(input_lines)):
         l = input_lines[index]
-        a,b,c = re.findall(r"\w{3}",l)
-        map[a] = [b,c]
+        a, b, c = re.findall(r"\w{3}", l)
+        map[a] = [b, c]
         # map[l.split(" = ")[0]] = ["".join([l for l in raw if l not in ['(',')']]) for raw in l.split(" = ")[1].split(", ")]
 
     instructions = input_lines[0]
@@ -88,11 +82,10 @@ def part1(input):
 
 if __name__ == '__main__':
     d = scrib.find_filename(__file__)
-    d = d[:len(d)-3]
+    d = d[:len(d) - 3]
 
     input_file = "./data/" + d + "_input.txt"
-    print("{} part 1: {}".format(d,part1(input_file)))
-    assert(part1(input_file)==22199)
-    print("{} part 2: {}".format(d,part2(input_file)))
-    assert(part2(input_file)==part2(input_file))
-
+    print("{} part 1: {}".format(d, part1(input_file)))
+    assert (part1(input_file) == 22199)
+    print("{} part 2: {}".format(d, part2(input_file)))
+    assert (part2(input_file) == part2(input_file))

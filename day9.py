@@ -3,6 +3,7 @@ import scrib
 import os
 from collections import namedtuple
 
+
 def part2(input):
     with open(input) as f:
         input_lines = f.read().splitlines()
