@@ -58,6 +58,7 @@ def get_type_v2(card):
     else:
         return 7
 
+
 def compare_same_types_v2(card1,card2):
     cards = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
 

@@ -2,6 +2,14 @@ import re
 from collections import Counter
 import os
 
+
+# lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
+# print(scrib.find_most_frequent(lst))
+# print(scrib.find_occurances(lst)[4])
+# print(scrib.find_even(lst))
+# print(scrib.capitalize_words(["python", "javaScript", "c++"]))
+# print(scrib.reverse_list(lst))
+
 class Node:
     def __init__(self, dataval=None):
         self.dataval = dataval
