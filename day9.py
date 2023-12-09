@@ -18,57 +18,32 @@ def parse(input):
 def part2(input):
     numbers = parse(input)
 
-    total = 0
-    current_list = []
-    for list_of_numbers in numbers:
-        current_list = list_of_numbers
-        iterations = 0
-        previous_lists = [current_list]
-        occ = scrib.find_occurances(current_list)
-        while len(list(occ)) > 1 and occ.most_common(1) != 0:
-            new_list = [current_list[index+1]-current_list[index] for index in range(len(current_list)-1)]
-            previous_lists.append(new_list)
-            occ = scrib.find_occurances(new_list)
-            iterations = iterations + 1
-            current_list = new_list
-
-        # previoius_lists is a history
-        first_num = 0
-        for list_index in range(len(previous_lists)-2,-1,-1):
-            first_num = previous_lists[list_index][0] -previous_lists[list_index+1][0]
-            previous_lists[list_index].insert(0,first_num)
-
-        total = total + previous_lists[0][0]
+    total = sum([get_first(nums) for nums in numbers])
 
     return total
+
+
+def get_first(my_list):
+    occ = scrib.find_occurances(my_list)
+    if len(list(occ)) == 1 and occ.most_common(1)[0][0] == 0:
+        return 0
+    else:
+        return my_list[0] - get_first([my_list[index+1]-my_list[index] for index in range(len(my_list)-1)])
+
+
+def get_next(my_list):
+    occ = scrib.find_occurances(my_list)
+    if len(list(occ)) == 1 and occ.most_common(1)[0][0] == 0:
+        return 0
+    else:
+        return my_list[-1] + get_next([my_list[index+1]-my_list[index] for index in range(len(my_list)-1)])
 
 
 def part1(input):
     numbers = parse(input)
 
-    total = 0
+    total = sum([get_next(nums) for nums in numbers])
 
-    current_list = []
-    for list_of_numbers in numbers:
-        current_list = list_of_numbers
-        iterations = 0
-        previous_lists = [current_list]
-        occ = scrib.find_occurances(current_list)
-        while len(list(occ)) > 1 and occ.most_common(1) != 0:
-            new_list = [current_list[index+1]-current_list[index] for index in range(len(current_list)-1)]
-            previous_lists.append(new_list)
-            occ = scrib.find_occurances(new_list)
-            iterations = iterations + 1
-            current_list = new_list
-
-        # previoius_lists is a history
-        next_num = 0
-        for list_index in range(len(previous_lists)-2,-1,-1):
-            next_num = previous_lists[list_index+1][-1] + previous_lists[list_index][-1]
-            previous_lists[list_index].append(next_num)
-
-        total = total + previous_lists[0][-1]
-        # print(previous_lists)
     return total
 
 
@@ -78,7 +53,9 @@ if __name__ == '__main__':
 
     input_file = "./data/" + d + "_input.txt"
     print("{} part 1: {}".format(d,part1(input_file)))
+    assert(part1(input_file)==2005352194)
     print("{} part 2: {}".format(d,part2(input_file)))
+    assert(part2(input_file)==1077)
     # print("day 8 part 1: {}".format(part1("./data/day10_test.txt")))
 
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
