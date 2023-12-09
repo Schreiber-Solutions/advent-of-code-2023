@@ -10,22 +10,16 @@ def part2(input):
         input_lines = f.read().splitlines()
 
     total = 0
-    map = {}
-    for index in range(2, len(input_lines)):
-        l = input_lines[index]
-        a, b, c = re.findall(r"\w{3}", l)
-        map[a] = [b, c]
+    graph, instructions = parse(input_lines)
 
-    instructions = input_lines[0]
-
-    next_node = [k for k in map.keys() if k[-1] == 'A']
+    next_node = [k for k in graph.keys() if k[-1] == 'A']
     which = {}
     while len(which) < len(next_node):
         for i in instructions:
             if i == "L":
-                next_node = [map[k][0] for k in next_node]
+                next_node = [graph[k][0] for k in next_node]
             else:
-                next_node = [map[k][1] for k in next_node]
+                next_node = [graph[k][1] for k in next_node]
 
             total = total + 1
             if len([n for n in next_node if n[-1] == "Z"]) == 1:
@@ -38,20 +32,14 @@ def part2(input):
     return lcm(*list(which.values()))
 
 
-def get_prime_factors(n):
-    i = 2
-    prime_factors = []
-    while i * i <= n:
-        if n % i == 0:
-            prime_factors.append(i)
-            n //= i
-        else:
-            i += 1
-
-    if n > 1:
-        prime_factors.append(n)
-
-    return prime_factors
+def parse(input_lines):
+    graph = {}
+    for index in range(2, len(input_lines)):
+        l = input_lines[index]
+        a, b, c = re.findall(r"\w{3}", l)
+        graph[a] = [b, c]
+    instructions = input_lines[0]
+    return graph, instructions
 
 
 def part1(input):
@@ -60,20 +48,14 @@ def part1(input):
 
     total = 0
 
-    map = {}
-    for index in range(2, len(input_lines)):
-        l = input_lines[index]
-        a, b, c = re.findall(r"\w{3}", l)
-        map[a] = [b, c]
-        # map[l.split(" = ")[0]] = ["".join([l for l in raw if l not in ['(',')']]) for raw in l.split(" = ")[1].split(", ")]
+    graph, instructions = parse(input_lines)
 
-    instructions = input_lines[0]
     instruction_numbers = [0 if c == 'L' else 1 for c in instructions]
     next_node = "AAA"
 
     while True:
         for i in instruction_numbers:
-            next_node = map[next_node][i]
+            next_node = graph[next_node][i]
             total = total + 1
 
             if next_node == "ZZZ":
