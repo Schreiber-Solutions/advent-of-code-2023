@@ -1,6 +1,6 @@
+my_cookie=$(cat ./cookie.txt)
+echo $my_cookie
 
-
-my_cookie="cookie: session=53616c7465645f5fbda16c0dbd10ccb61e1d92c43f96d017dfa2bb09385c95809a0a0d1b13976bb0bc64013824ca64d8a59adddc0a54b4c4d4591309884fb005;"
 #url_path_str=$(awk -F/ '{x=$(NF)+0;print $(NF-1) " " x}' <(echo $PWD))
 year=2023
 day=$1
