@@ -36,6 +36,7 @@ def part2_v2(input):
         input_lines = f.read().splitlines()
 
     seeds = [int(n) for n in input_lines[0].split()[1:]]
+
     lowest_location, maps = load_file(input_lines)
 
     location_starts = [maps[len(maps)-1][i][0] for i in range(len(maps[len(maps)-1]))]
@@ -56,7 +57,7 @@ def check_range(maps, seeds, start, end):
     if step < 1:
         step = 1
 
-    # print("trying {} to {} step {}".format(start,end,step))
+    print("trying {} to {} step {}".format(start,end,step))
     for location in range(start,end,step):
         num = location_to_seed(maps, location)
 

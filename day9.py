@@ -18,17 +18,9 @@ def parse(input):
 def part2(input):
     numbers = parse(input)
 
-    total = sum([get_first(nums) for nums in numbers])
+    total = sum([get_next(nums) for nums in numbers if nums.reverse() is None])
 
     return total
-
-
-def get_first(my_list):
-    occ = scrib.find_occurances(my_list)
-    if len(list(occ)) == 1:
-        return occ.most_common(1)[0][0]
-    else:
-        return my_list[0] - get_first([my_list[index+1]-my_list[index] for index in range(len(my_list)-1)])
 
 
 def get_next(my_list):

@@ -13,6 +13,7 @@ then
         echo $urlPath >&2
         file_name="./data/day${day}_input.txt"
         curl "$urlPath" -H "$my_cookie" -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36' --compressed > $file_name
+        cat $file_name
     else
         echo "Your dirPath doesn't match a year. CWD must be end with year/day" >&2
     fi
