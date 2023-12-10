@@ -96,14 +96,11 @@ def find_inside_tiles(grid, path):
     inside = []
     for p_i in range(len(path) - 1):
         step = (path[p_i + 1][0] - path[p_i][0], path[p_i + 1][1] - path[p_i][1])
-        target = (path[p_i][0] + check[step][0], path[p_i][1] + check[step][1])
-        if target not in path:
-            grid[target] = "I"
-            inside.append(target)
-        target = (path[p_i + 1][0] + check[step][0], path[p_i + 1][1] + check[step][1])
-        if target not in path:
-            grid[target] = "I"
-            inside.append(target)
+        for i in range(2): # from and to tiles
+            target = (path[p_i + i][0] + check[step][0], path[p_i + i][1] + check[step][1])
+            if target not in path:
+                grid[target] = "I"
+                inside.append(target)
 
     made_changes = True
     while made_changes:
@@ -111,7 +108,7 @@ def find_inside_tiles(grid, path):
         made_changes = False
         for i in inside:
             for s in [(-1, 0), (1, 0), (0, 1), (0, -1)]:
-                if add(i, s) not in path and add(i, s) not in inside:
+                if add(i, s) not in path and add(i, s) not in inside and add(i, s) not in new_inside:
                     new_inside.append(add(i, s))
                     grid[add(i, s)] = "I"
                     made_changes = True
