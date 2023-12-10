@@ -154,6 +154,19 @@ def get_prime_factors(n):
 
     return prime_factors
 
+def get(grid,r,c):
+    default = "."
+    if (r,c) in grid.keys():
+        return grid[(r,c)]
+    else:
+        return default
+
+def parsegrid(lines):
+    grid = {}
+    for r in range(len(lines)):
+        for c in range(len(lines[0])):
+            grid[(r,c)] = lines[r][c]
+    return grid
 
 def a_star_algorithm(grid, start_node, stop_node, get_neighbors):
     # def get_neighbors(grid,p):

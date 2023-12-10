@@ -24,11 +24,12 @@ def part2(input):
 
 
 def get_next(my_list):
-    occ = scrib.find_occurances(my_list)
-    if len(list(occ)) == 1:
-        return occ.most_common(1)[0][0]
-    else:
-        return my_list[-1] + get_next([my_list[index+1]-my_list[index] for index in range(len(my_list)-1)])
+    l = my_list
+    t = my_list[-1]
+    while not all([n == 0 for n in l]):
+        l = [l[i+1]-l[i] for i in range(len(l)-1)]
+        t = t + l[-1]
+    return t
 
 
 def part1(input):
