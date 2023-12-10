@@ -3,6 +3,7 @@ import scrib
 import os
 from collections import namedtuple
 
+print_map = {'|':u"\u2503", '-':u"\u2501", 'L':u"\u2517", 'J':u"\u251b", 'F':u"\u250f", '7':u"\u2513", 'S':'S'}
 
 map = {'|': [(-1,0),(1,0)],
         '-': [(0,1),(0,-1)],
@@ -13,10 +14,7 @@ map = {'|': [(-1,0),(1,0)],
          'S': [(1,0),(0,1),(-1,0),(0,-1)],
        '.': []}
 
-included = {'|': [(0,1)],
-            '-': [(-1,0)],
-            'L': [],
-            }
+included = ['|', 'S', '7','F']
 
 
 def n(grid,r,c):
@@ -35,17 +33,28 @@ def n(grid,r,c):
 
 def p(grid,path,inside):
     i_count = 0
+    new_i_count = 0
+
     for r in range(max([n[0] for n in grid.keys()])+1):
+        i_parity = 0
         for c in range(max([n[1] for n in grid.keys()])+1):
             if (r,c) in path:
-                print(scrib.get(grid,r,c),end="")
+                print(print_map[scrib.get(grid,r,c)],end="")
             elif (r,c) in inside:
                 i_count += 1
                 print("I", end="")
             else:
-                print(" ",end="")
+                print(i_parity, end="")
+                # print(" ",end="")
+
+            me = scrib.get(grid,r,c)
+            if (r,c) in path and me in included:
+                i_parity = (i_parity + 1) % 2
+            elif (r,c) not in path:
+                new_i_count += i_parity
+
         print()
-    print("included count {}".format(i_count))
+    print("included count {} (new count {})".format(i_count,new_i_count))
 
 
 check = {(0,-1): (-1,0), (1,0): (0,-1), (0,1): (1,0), (-1,0): (0,1)}
@@ -78,7 +87,7 @@ def part1(input):
 
             inside = find_inside_tiles(grid, path)
 
-            # p(grid,path,inside)
+            p(grid,path,inside)
             # print(len(inside)) # 1024 is too high, 392 too low
 
             return(int(len(path)/2),len(inside))
