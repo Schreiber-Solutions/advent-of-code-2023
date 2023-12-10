@@ -4,22 +4,6 @@ import os
 from collections import namedtuple
 
 
-def part2(input):
-    with open(input) as f:
-        lines = f.read().splitlines()
-
-    t = 0
-
-    return t
-
-moves = {'|': ['|', 'L','J','7','F'],
-         '-': ['-', 'L','J','7','F'],
-         'L': ['|','-','J','7'],
-         'J': ['|','-','L','7','F'],
-         '7': ['|','-','J','L','F'],
-         'F': ['|','-','J','7','L'],
-         'S': ['|','-','J','7','L', 'F'],
-         '.': []}
 map = {'|': [(-1,0),(1,0)],
         '-': [(0,1),(0,-1)],
         'L': [(-1,0),(0,1)],
@@ -28,6 +12,13 @@ map = {'|': [(-1,0),(1,0)],
         'F': [(1,0),(0,1)],
          'S': [(1,0),(0,1),(-1,0),(0,-1)],
        '.': []}
+
+included = {'|': [(0,1)],
+            '-': [(-1,0)],
+            'L': [],
+            }
+
+
 def n(grid,r,c):
     n = []
     m = scrib.get(grid,r,c)
@@ -38,20 +29,31 @@ def n(grid,r,c):
                 e = grid.get((r+x1,c+x2))
                 if e in map.keys() and (-1*x1,-1*x2) in map[e] and (m == 'S' or (x1,x2) in map[m]):
                     n.append((r+x1,c+x2))
-                # else:
-                #     if m != 'S':
-                #         print((-x1,-x2),m, e, map[m],map[e])
 
     return n
 
-def p(grid,path):
+
+def p(grid,path,inside):
+    i_count = 0
     for r in range(max([n[0] for n in grid.keys()])+1):
         for c in range(max([n[1] for n in grid.keys()])+1):
             if (r,c) in path:
                 print(scrib.get(grid,r,c),end="")
+            elif (r,c) in inside:
+                i_count += 1
+                print("I", end="")
             else:
-                print(".",end="")
+                print(" ",end="")
         print()
+    print("included count {}".format(i_count))
+
+
+check = {(0,-1): (-1,0), (1,0): (0,-1), (0,1): (1,0), (-1,0): (0,1)}
+
+
+def add(x1,x2):
+    return (x1[0]+x2[0],x1[1]+x2[1])
+
 
 def part1(input):
     with open(input) as f:
@@ -72,8 +74,14 @@ def part1(input):
         path.append(e)
         # print(len(path))
         if e == start or len([a for a in n(grid,*e) if a not in path]) == 0:
-            p(grid,path)
-            return(len(path)/2)
+            # complete path
+
+            inside = find_inside_tiles(grid, path)
+
+            # p(grid,path,inside)
+            # print(len(inside)) # 1024 is too high, 392 too low
+
+            return(int(len(path)/2),len(inside))
         else:
             if len(n(grid,*e)) > 2:
                 print("{} neighbors {}".format(e,n(grid,*e)))
@@ -84,13 +92,43 @@ def part1(input):
     return t
 
 
+def find_inside_tiles(grid, path):
+    inside = []
+    for p_i in range(len(path) - 1):
+        step = (path[p_i + 1][0] - path[p_i][0], path[p_i + 1][1] - path[p_i][1])
+        target = (path[p_i][0] + check[step][0], path[p_i][1] + check[step][1])
+        if target not in path:
+            grid[target] = "I"
+            inside.append(target)
+        target = (path[p_i + 1][0] + check[step][0], path[p_i + 1][1] + check[step][1])
+        if target not in path:
+            grid[target] = "I"
+            inside.append(target)
+
+    made_changes = True
+    while made_changes:
+        new_inside = inside.copy()
+        made_changes = False
+        for i in inside:
+            for s in [(-1, 0), (1, 0), (0, 1), (0, -1)]:
+                if add(i, s) not in path and add(i, s) not in inside:
+                    new_inside.append(add(i, s))
+                    grid[add(i, s)] = "I"
+                    made_changes = True
+
+        inside = list(set(new_inside))
+
+    return inside
+
+
 if __name__ == '__main__':
     d = scrib.find_filename(__file__)
     d = d[:len(d)-3]
 
     input_file = "./data/" + d + "_input.txt"
-    print("{} part 1: {}".format(d,part1(input_file)))
-    print("{} part 2: {}".format(d,part2(input_file)))
+    p1,p2=part1(input_file)
+    print("{} part 1: {}".format(d,p1))
+    print("{} part 2: {}".format(d,p2))
     # print("day 8 part 1: {}".format(part1("./data/day10_test.txt")))
 
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
