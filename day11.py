@@ -8,10 +8,30 @@ def solve(input):
     with open(input) as f:
         lines = f.read().splitlines()
 
-    t = 0
+    grid = scrib.parsegrid(lines)
 
+    g = []
+    max_r = len(lines)
+    max_c = len(lines[0])
 
-    return t, t
+    for r in range(len(lines)):
+        for c in range(len(lines[0])):
+            if scrib.get(grid,r,c) == "#":
+                g.append((r,c))
+
+    ex_r = [r for r in range(max_r) if all([scrib.get(grid,r,c)=='.' for c in range(max_c+1)])]
+    ex_c = [c for c in range(max_c) if all([scrib.get(grid,r,c)=='.' for r in range(max_r+1)])]
+
+    d_p1 = {}
+    d_p2 = {}
+    for g1 in g:
+        for g2 in g:
+            if g1 != g2:
+                if (g1,g2) not in d_p1.keys() and (g2,g1) not in d_p1.keys():
+                    d_p2[(g1,g2)] = abs(g1[0]-g2[0]) + abs(g1[1]-g2[1]) + sum([999999 for r in ex_r if min(g1[0],g2[0]) < r < max(g1[0],g2[0])]) + sum([999999 for c in ex_c if min(g1[1],g2[1]) < c < max(g1[1],g2[1])])
+                    d_p1[(g1,g2)] = abs(g1[0]-g2[0]) + abs(g1[1]-g2[1]) + sum([1 for r in ex_r if min(g1[0],g2[0]) < r < max(g1[0],g2[0])]) + sum([1 for c in ex_c if min(g1[1],g2[1]) < c < max(g1[1],g2[1])])
+
+    return sum(d_p1.values()), sum(d_p2.values())
 
 
 if __name__ == '__main__':
@@ -29,4 +49,3 @@ if __name__ == '__main__':
     # print(scrib.find_occurances(lst)[4])
     # print(scrib.find_even(lst))
     # print(scrib.capitalize_words(["python", "javaScript", "c++"]))
-    # print(scrib.reverse_list(lst))
