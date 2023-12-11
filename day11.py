@@ -19,9 +19,9 @@ def solve(input):
     # ex_r = [r for r in range(max_r) if all([scrib.get(grid,r,c)=='.' for c in range(max_c+1)])]
     # ex_c = [c for c in range(max_c) if all([scrib.get(grid,r,c)=='.' for r in range(max_r+1)])]
 
-    g = [(r,c) for r,line in enumerate(lines) for c,item in enumerate(line) if item == "#"]
-    ex_r = [r for r,item in enumerate(lines) if all(i == "." for i in item)]
-    ex_c = [c for c,item in enumerate(zip(*lines)) if all(i == "." for i in item)]
+    g = [(r, c) for r, line in enumerate(lines) for c,item in enumerate(line) if item == "#"]
+    ex_r = [r for r, item in enumerate(lines) if all(i == "." for i in item)]
+    ex_c = [c for c, item in enumerate(zip(*lines)) if all(i == "." for i in item)]
 
     d_p1 = {}
     d_p2 = {}
@@ -29,6 +29,7 @@ def solve(input):
         for j, g2 in enumerate(g[:k+1]):
             exp_r = (sum([1 for r in ex_r if r in range(*sorted([g1[0],g2[0]]))]))
             exp_c = (sum([1 for c in ex_c if c in range(*sorted([g1[1],g2[1]]))]))
+
             d_p2[(g1,g2)] = abs(g1[0]-g2[0]) + abs(g1[1]-g2[1]) + exp_r*999999 + exp_c*999999
             d_p1[(g1,g2)] = abs(g1[0]-g2[0]) + abs(g1[1]-g2[1]) + exp_r + exp_c
 
