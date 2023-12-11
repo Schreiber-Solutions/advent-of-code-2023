@@ -10,6 +10,7 @@ def solve(input):
 
     t = 0
 
+
     return t, t
 
 

@@ -31,6 +31,21 @@ def n(grid,r,c):
     return n
 
 
+def count_included(grid,path):
+    new_i_count = 0
+
+    for r in range(max([n[0] for n in grid.keys()])+1):
+        i_parity = 0
+        for c in range(max([n[1] for n in grid.keys()])+1):
+            me = scrib.get(grid,r,c)
+            if (r,c) in path and me in included:
+                i_parity = (i_parity + 1) % 2
+            elif (r,c) not in path:
+                new_i_count += i_parity
+
+    return new_i_count
+
+
 def p(grid,path,inside):
     i_count = 0
     new_i_count = 0
@@ -85,12 +100,11 @@ def part1(input):
         if e == start or len([a for a in n(grid,*e) if a not in path]) == 0:
             # complete path
 
-            inside = find_inside_tiles(grid, path)
-
-            p(grid,path,inside)
+            # inside = find_inside_tiles(grid, path)
+            # p(grid,path,inside)
             # print(len(inside)) # 1024 is too high, 392 too low
 
-            return(int(len(path)/2),len(inside))
+            return(int(len(path)/2),count_included(grid,path))
         else:
             if len(n(grid,*e)) > 2:
                 print("{} neighbors {}".format(e,n(grid,*e)))
