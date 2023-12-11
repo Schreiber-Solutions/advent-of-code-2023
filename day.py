@@ -21,7 +21,6 @@ if __name__ == '__main__':
     p1, p2 = solve(input_file)
     print("{} part 1: {}".format(d,p1))
     print("{} part 2: {}".format(d,p2))
-    # print("day 8 part 1: {}".format(part1("./data/day10_test.txt")))
 
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
     # print(scrib.find_most_frequent(lst))
