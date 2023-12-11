@@ -14,10 +14,7 @@ def solve(input):
     max_r = len(lines)
     max_c = len(lines[0])
 
-    for r in range(len(lines)):
-        for c in range(len(lines[0])):
-            if scrib.get(grid,r,c) == "#":
-                g.append((r,c))
+    g = [k for k in grid if grid[k] == "#"]
 
     ex_r = [r for r in range(max_r) if all([scrib.get(grid,r,c)=='.' for c in range(max_c+1)])]
     ex_c = [c for c in range(max_c) if all([scrib.get(grid,r,c)=='.' for r in range(max_r+1)])]
