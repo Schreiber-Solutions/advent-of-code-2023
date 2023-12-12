@@ -2,7 +2,7 @@ import re
 import scrib as s
 import os
 from collections import namedtuple
-
+import itertools, operator
 
 def solve(input):
     with open(input) as f:
@@ -21,6 +21,7 @@ if __name__ == '__main__':
     p1, p2 = solve(input_file)
     print("{} part 1: {}".format(d,p1))
     print("{} part 2: {}".format(d,p2))
+
 
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
     # print(s.find_most_frequent(lst))

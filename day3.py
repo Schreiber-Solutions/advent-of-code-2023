@@ -2,6 +2,8 @@ import re
 import scrib
 import os
 from collections import namedtuple
+import itertools, operator
+
 
 def is_gear_adjacent(g,row,col):
     for r_o in [-1,0,1]:
@@ -38,25 +40,16 @@ def part2(input):
             else:
                 if num.isnumeric() and is_symbol:
                     if location in gears.keys():
-                        gears[location].append(num)
+                        gears[location].append(int(num))
                     else:
-                        gears[location] = [num]
+                        gears[location] = [int(num)]
 
                     # print("found gear at {}".format(location))
                 location = (-1,-1)
                 num = ""
                 is_symbol = False
 
-    for g in gears.keys():
-        if len(gears[g]) > 1:
-            # print("location {} has {}".format(g,gears[g]))
-            num = 1
-            
-            for n in gears[g]:
-                num = num * int(n)
-
-
-            total = total + num
+    total = sum([list(itertools.accumulate(gears[g], operator.mul))[-1] for g in gears if len(gears[g]) > 1])
 
     return total
 
