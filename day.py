@@ -1,5 +1,5 @@
 import re
-import scrib
+import scrib as s
 import os
 from collections import namedtuple
 
@@ -14,7 +14,7 @@ def solve(input):
 
 
 if __name__ == '__main__':
-    d = scrib.find_filename(__file__)
+    d = s.find_filename(__file__)
     d = d[:len(d)-3]
 
     input_file = "./data/" + d + "_input.txt"
@@ -23,8 +23,7 @@ if __name__ == '__main__':
     print("{} part 2: {}".format(d,p2))
 
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
-    # print(scrib.find_most_frequent(lst))
-    # print(scrib.find_occurances(lst)[4])
-    # print(scrib.find_even(lst))
-    # print(scrib.capitalize_words(["python", "javaScript", "c++"]))
-    # print(scrib.reverse_list(lst))
+    # print(s.find_most_frequent(lst))
+    # print(s.find_occurances(lst)[4])
+    # print(s.find_even(lst))
+    # print(s.capitalize_words(["python", "javaScript", "c++"]))

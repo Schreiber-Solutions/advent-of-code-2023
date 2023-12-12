@@ -1,5 +1,5 @@
 import re
-import scrib
+import scrib as s
 import os
 from collections import namedtuple
 from timeit import default_timer as timer
@@ -9,7 +9,7 @@ def solve(input):
     with open(input) as f:
         lines = f.read().splitlines()
 
-    # grid = scrib.parsegrid(lines)
+    # grid = s.parsegrid(lines)
 
     g = []
     # max_r = len(lines)
@@ -30,14 +30,14 @@ def solve(input):
             exp_r = (sum([1 for r in ex_r if r in range(*sorted([g1[0],g2[0]]))]))
             exp_c = (sum([1 for c in ex_c if c in range(*sorted([g1[1],g2[1]]))]))
 
-            d_p2[(g1,g2)] = abs(g1[0]-g2[0]) + abs(g1[1]-g2[1]) + exp_r*999999 + exp_c*999999
-            d_p1[(g1,g2)] = abs(g1[0]-g2[0]) + abs(g1[1]-g2[1]) + exp_r + exp_c
+            d_p2[(g1,g2)] = s.distance(g1,g2) + exp_r*999999 + exp_c*999999
+            d_p1[(g1,g2)] = s.distance(g1,g2) + exp_r + exp_c
 
     return sum(d_p1.values()), sum(d_p2.values())
 
 
 if __name__ == '__main__':
-    d = scrib.find_filename(__file__)
+    d = s.find_filename(__file__)
     d = d[:len(d)-3]
 
     input_file = "./data/" + d + "_input.txt"

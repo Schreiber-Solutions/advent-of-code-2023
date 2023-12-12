@@ -41,10 +41,11 @@ def mult_point(p1,d):
         return Point(p1.x * d, p1.y * d, p1.z * d)
 
 def manhattan_distance(p1:ThreeD_Point, p2:ThreeD_Point):
-    if type(p1) is Point:
-        return abs(p1.x - p2.x) + abs(p1.y - p2.y)
-    elif type(p1) is ThreeD_Point:
-        return abs(p1.x - p2.x) + abs(p1.y - p2.y) + abs(p1.z - p2.z)
+    return distance(p1, p2)
+    # if type(p1) is Point:
+    #     return abs(p1.x - p2.x) + abs(p1.y - p2.y)
+    # elif type(p1) is ThreeD_Point:
+    #     return abs(p1.x - p2.x) + abs(p1.y - p2.y) + abs(p1.z - p2.z)
 
 def find_filename(input_string):
     result = os.path.basename(input_string)
@@ -153,6 +154,11 @@ def get_prime_factors(n):
         prime_factors.append(n)
 
     return prime_factors
+
+
+def distance(p1, p2):
+    return sum([abs(e[0]-e[1]) for e in zip(p1,p2)])
+
 
 def get(grid,r,c):
     default = "."
