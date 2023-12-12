@@ -4,6 +4,12 @@ import os
 from collections import namedtuple
 from timeit import default_timer as timer
 
+def n(grid,p):
+    n_list = []
+    for r, c in [(-1,0), (1,0), (0,1), (0,-1)]:
+            n_list.append((p[0]+r,p[1]+c))
+    return n_list
+
 
 def solve(input):
     with open(input) as f:
@@ -19,7 +25,13 @@ def solve(input):
     # ex_r = [r for r in range(max_r) if all([scrib.get(grid,r,c)=='.' for c in range(max_c+1)])]
     # ex_c = [c for c in range(max_c) if all([scrib.get(grid,r,c)=='.' for r in range(max_r+1)])]
 
+    grid = {(r,c): item for r, line in enumerate(lines) for c,item in enumerate(line)}
     g = [(r, c) for r, line in enumerate(lines) for c,item in enumerate(line) if item == "#"]
+
+    print(n(grid,g[0]))
+    print(g[0],g[1])
+    print(s.a_star_algorithm(grid, g[0], g[1], n))
+
     ex_r = [r for r, item in enumerate(lines) if all(i == "." for i in item)]
     ex_c = [c for c, item in enumerate(zip(*lines)) if all(i == "." for i in item)]
 
