@@ -175,12 +175,15 @@ def parsegrid(lines):
     return grid
 
 
-def lines_to_blocks(lines):
+def lines_to_blocks(lines, divider = None):
+
+    divider = "" if divider is None else divider
+
     g = []
     m = []
     for l in lines:
         r = 0
-        if l != "":
+        if l != divider:
             m.append(l)
             r = r + 1
         else:
