@@ -107,7 +107,6 @@ def solve(input):
 
         print("part 2: {}".format(retval2))
         r2 += retval2
-        # 864204545186 too low
     return r1, r2
 
 
