@@ -18,36 +18,37 @@ def vary(m):
             retval.append(m_p)
     return retval
 
-def check_v(m):
+def check_v(m,exclude):
     columns = list(zip(*m))
 
     max_c = len(columns)
     for c, col in enumerate(columns):
 
         if (c < len(columns) - 1):
-            if columns[c] == columns[c + 1]:
+            if columns[c] == columns[c + 1] and c != exclude:
                 many = min(abs(max_c - c - 2), c)
 
                 if all(columns[c - i] == columns[c + 1 + i] for i in range(0, many + 1)):
                     return c
+
     return -1
 
-def check_h(m):
+def check_h(m, exclude):
     max_r = len(m)
     for r in range(max_r - 1):
-        if m[r] == m[r + 1]:
+        if m[r] == m[r + 1] and r != exclude:
             many = min(abs(max_r - r - 2), r)
 
             if all(m[r - i] == m[r + 1 + i] for i in range(0, many + 1)):
                 # print("v-line",r)
                 return r
+
     return -1
 
 def solve(input):
     with open(input) as f:
         lines = f.read().splitlines()
 
-    p1, p2 = 0, 0
 
     g = []
     m = []
@@ -68,7 +69,6 @@ def solve(input):
     p1 = {}
 
     for m in g:
-        print("map:",m_count)
         max_r = len(m)
         for r in range(max_r-1):
             if m[r] == m[r+1]: ## check more rows
@@ -78,7 +78,6 @@ def solve(input):
                 #     print(r,i,r-i,r+1+i,(m[r-i],m[r+1+i]),max_r)
 
                 if all(m[r-i] == m[r+1+i] for i in range(0,many+1)):
-                    print(r,[m[r-i] == m[r+1+i] for i in range(0,many+1)])
                     h.append(r+1)
                     p1[m_count] = "h"+str(r)
 
@@ -89,7 +88,6 @@ def solve(input):
     m_count = 0
     for m in g:
         columns = list(zip(*m))
-        print("map:",m_count)
         max_c = len(columns)
         for c, col in enumerate(columns):
 
@@ -112,33 +110,27 @@ def solve(input):
     print("begin part 2")
     m_count = 0
     for m_original in g:
-        print("map {}".format(m_count))
         for m in vary(m_original):
             # print("map {} variant".format(m))
-            r = check_h(m)
+            exclude = s.find_int(p1[m_count]) if p1[m_count][0]=="h" else -1
+            r = check_h(m,exclude)
             if r >= 0 and "h"+str(r) != p1[m_count]:
-                print("Found h {} (was {})".format(r,p1[m_count]))
                 h2.append(r + 1)
                 p2[m_count] = "h" + str(r)
                 break
 
-            c = check_v(m)
+            exclude = s.find_int(p1[m_count]) if p1[m_count][0]=="v" else -1
+            c = check_v(m,exclude)
             if c >= 0 and "v" + str(c) != p1[m_count]:
-                print("Found v {}".format(c))
                 v2.append(c + 1)
                 p2[m_count] = "v" + str(c)
                 break
 
         m_count = m_count + 1
 
-    p1 = sum(v)
-    p1 = p1 + sum([n*100 for n in h])
 
 
-    print(len(p2),p2)
-    print(h2, v2)
-
-    return p1, sum(v2) + sum([n*100 for n in h2])
+    return sum(v) + sum([n*100 for n in h]), sum(v2) + sum([n*100 for n in h2])
     # part 2 10770 is too low
     # part 2 32334 too high
 
