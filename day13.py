@@ -26,12 +26,10 @@ def check_v(m, exclude):
     max_c = len(columns)
     for c, col in enumerate(columns):
 
-        if (c < len(columns) - 1):
-            if columns[c] == columns[c + 1] and c != exclude:
-                many = min(abs(max_c - c - 2), c)
-
-                if all(columns[c - i] == columns[c + 1 + i] for i in range(0, many + 1)):
-                    return c
+        if c < len(columns) - 1:
+            many = min(abs(max_c - c - 2), c)
+            if c != exclude and all(columns[c - i] == columns[c + 1 + i] for i in range(0, many + 1)):
+                return c
 
     return -1
 
@@ -39,12 +37,10 @@ def check_v(m, exclude):
 def check_h(m, exclude):
     max_r = len(m)
     for r in range(max_r - 1):
-        if m[r] == m[r + 1] and r != exclude:
-            many = min(abs(max_r - r - 2), r)
+        many = min(abs(max_r - r - 2), r)
 
-            if all(m[r - i] == m[r + 1 + i] for i in range(0, many + 1)):
-                # print("v-line",r)
-                return r
+        if r != exclude and all(m[r - i] == m[r + 1 + i] for i in range(0, many + 1)):
+            return r
 
     return -1
 

@@ -177,13 +177,13 @@ def parsegrid(lines):
 
 def lines_to_blocks(lines, divider = None):
 
-    divider = "" if divider is None else divider
+    divider = "^$" if divider is None else divider
 
     g = []
     m = []
     for l in lines:
         r = 0
-        if l != divider:
+        if re.search(divider, l) is None:
             m.append(l)
             r = r + 1
         else:
