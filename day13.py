@@ -82,7 +82,6 @@ def solve(input):
                     p1[m_count] = "h"+str(r)
 
         m_count = m_count + 1
-    print(h)
 
     v = []
     m_count = 0
@@ -100,14 +99,11 @@ def solve(input):
                         p1[m_count] = "v"+str(c)
         m_count = m_count + 1
 
-    print(len(p1))
-    # print(p1)
 
     h2 = []
     v2 = []
     p2 = {}
 
-    print("begin part 2")
     m_count = 0
     for m_original in g:
         for m in vary(m_original):
