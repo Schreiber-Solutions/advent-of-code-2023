@@ -1,83 +1,83 @@
 import re
-
+from functools import lru_cache
+from typing import List, Tuple
 import scrib
 import scrib as s
 import os
 from collections import namedtuple
 import itertools, operator
 
+@lru_cache()
 def fu(s,c):
-    for index, source in enumerate(s):
-        if source == "?":
-            a = s[:index] + "." + s[index + 1:]
-            if all([item != '?' for item in a]):
-                # print("{} -> {}".format(s,a))
-
-                r = 0
-                occ = [len(g) for g in re.split(r"(\.+)", a) if all(item != '.' for item in g) and len(g) > 0]
-                if (occ == c):
-                    # print(occ, c)
-                    r += 1
-
-                a = s[:index] + "#" + s[index + 1:]
-                # print("{} -> {}".format(s,a))
-
-                occ = [len(g) for g in re.split(r"(\.+)", a) if all(item != '.' for item in g) and len(g) > 0]
-                if (occ == c):
-                    # print(occ, c)
-                    r += 1
-
-                return r
-            else:
-                current = [len(g) for g in re.split(r"(\.+)",s[:index]) if all(item != '.' for item in g) and len(g) > 0]
-                # print(current,c[:len(current)])
-                if current == c[:len(current)]:
-                    r1 = fu(s[:index] + "." + s[index + 1:],c)
-                else:
-                    r1 = 0
-
-                # print(current[:-1],c[:len(current)-1],current[-1],c[len(current)-1])
-                if len(current) > len(c):
-                    r2 = 0
-                elif len(current) < 1 or (current[:-1] == c[:len(current)-1] and current[-1] <= c[len(current)-1]):
-                    r2 = fu(s[:index] + "#" + s[index + 1:],c)
-                else:
-                    r2 = 0
-
-                return r1 + r2
-
-    if [len(g) for g in re.split(r"(\.+)",s) if all(item != '.' for item in g) and len(g) > 0] == c:
-        return 1
-    else:
+    if len(c) == 0:
+        return 1 if '#' not in s else 0
+    if sum(c) + len(c) - 1 > len(s):
         return 0
 
-def way(c,s):
-    dots = len(s)-sum(c)-len(c)+1
-    guy = [[r] for r in range(0,dots)]
-    print(guy)
-    print(len(c))
+    if s[0] == '.':
+        return fu(s[1:],c)
 
-    for i in range(len(c)):
-        for g in guy:
-            g.append(c[i])
+    if s[0] == '?':
+        r1 = fu(s[1:], c)
+    else:
+        r1 = 0
 
-        if i == len(c):
-            start = 0
+    if '.' not in s[:c[0]] and (len(s) <= c[0] or len(s) > c[0] and s[c[0]] != '#'):
+        r2 = fu(s[c[0]+1:], c[1:])
+    else:
+        r2 = 0
+
+    return r1 + r2
+
+
+
+def is_valid(s,target):
+    if len(s) != len(target):
+        return False
+    else:
+        same = True
+        for index, item in enumerate(s):
+            # print("compare {} and {}".format(item,target[index]))
+            if item != '?' and item != target[index]:
+                same = False
+        return same
+
+
+def split_solve(s,c):
+    if len(s) == 0:
+        return 0
+
+    if len(c) == 1:
+        return fu(s,c)
+    elif len(c) == 2:
+        # retval = fu(s, c)
+        # n = 1
+        # # print([ [ split_solve(s[:index],c[:n])*split_solve(s[index:],c[n:]),s[:index],c[:n],s[index:],c[n:]] for index in range(len(s)) if s[index-1] != s[index] != "#"])
+        combos = [fu(s[:index],c[:1])*fu(s[index:],c[1:]) for index in range(len(s)) if s[index-1] != s[index] != "#"]
+        if len(combos) > 0:
+            retval = max([fu(s[:index],c[:1])*fu(s[index:],c[1:]) for index in range(len(s)) if s[index-1] != s[index] != "#"])
         else:
-            start = 1
+            retval = 0
+        return retval
+    elif len(c)/2 == int(len(c)/2):
+        # print("{} {} and {} {}".format(s,c[:int(len(c)/2)],s,c[int(len(c)/2):]))
+        n = int(len(c)/2)
+        # print([ [ split_solve(s[:index],c[:n])*split_solve(s[index:],c[n:]),s[:index],c[:n],s[index:],c[n:]] for index in range(len(s))])
+        # print([ split_solve(s[:index],c[:n])*split_solve(s[index:],c[n:]) for index in range(len(s))])
+        retval = max([ split_solve(s[:index],c[:n])*split_solve(s[index:],c[n:]) for index in range(len(s))])
+        return retval
+    else:
+        last_group = "".join(["#"]*c[0]) + "."
+        retval = 0
 
-        new_guy = []
-        for a in range(start,dots):
-            for g in guy:
-                tmp = g.copy()
-                tmp.append(a)
-                new_guy.append(tmp)
+        for index in range(len(s)-sum(c)-len(c)+2):
+            target = "".join(['.']*index) + last_group + s[index+c[0]+1:]
 
-        guy = new_guy
-        guy = [g for g in guy if sum(g) <= len(s)]
-        print(i,len(guy))
-    guy = [g for g in guy if sum(g)==len(s)]
-    return(len(guy))
+            if is_valid(s,target):
+                num = split_solve(target[index+len(last_group):],c[1:])
+                # print("{} calling split_solve with {} and {} gets {}".format(index,target[index+len(last_group):],c[1:],num))
+                retval += split_solve(target[index+len(last_group):],c[1:])
+        return retval
 
 def solve(input):
     with open(input) as f:
@@ -89,39 +89,21 @@ def solve(input):
     for which, l in enumerate(lines):
         print("doing {}".format(which))
         s, c = l.split()
-        c = [int(n) for n in c.split(",")]
-
+        s = tuple(s)
+        c = tuple([int(n) for n in c.split(",")])
+        print(s,c)
         retval1 = fu(s,c)
         r1 += retval1
         print("part 1: {}".format(retval1))
 
-        s_p2 = "?".join([s,s,s,s,s])
-        c_p2 = [*c, *c, *c, *c, *c]
+        # s_p2 = tuple("?".join([s,s,s,s,s]))
+        s_p2 = (*s, '?', *s, '?', *s, '?', *s, '?', *s)
+        c_p2 = (*c, *c, *c, *c, *c)
         # print(s_p2,c_p2)
 
         retval2 = 0
-        if max(c) == 3 and s_p2.find("?###?") >= 0:
-            print("old:" + s_p2)
-            s_p2 = s_p2.replace("?###?", ".###.")
-            print("new:" + s_p2)
 
-        if c[0] == 1 and s_p2[:3] == "?#?":
-            s_p2 = ".#." + s_p2[3:]
-
-        print("{} has {} ?".format(s_p2, sum([1 for item in s_p2 if item == "?"])))
-        mid = int(len(s_p2)/2)
-        if s_p2.find(".") < 0:
-            # retval2=way(c_p2,s_p2)
-            retval2 = 0 # fu(s_p2, c_p2)
-        else:
-            while s_p2[mid] != ".":
-                mid = mid - 1
-
-            for index in range(len(c_p2)):
-                # print("trying {} with {} and {} with {}".format(s_p2[:mid],c_p2[:index],s_p2[mid:],c_p2[index:]))
-                a,b = fu(s_p2[:mid],c_p2[:index]),fu(s_p2[mid:],c_p2[index:])
-                # print("got {} and {}".format(a,b))
-                retval2 += a*b
+        retval2 = fu(s_p2,c_p2)
 
         print("part 2: {}".format(retval2))
         r2 += retval2
@@ -129,18 +111,65 @@ def solve(input):
     return r1, r2
 
 
+
 if __name__ == '__main__':
     d = s.find_filename(__file__)
     d = d[:len(d)-3]
 
+    s = tuple("???.###")
+    c = (1, 1, 3)
+    print (fu(s, c))
+    assert(fu(s,c)==1)
+
+    s = tuple(".??..??...?##.")
+    c = (1, 1, 3)
+    print (fu(s, c))
+    assert(fu(s,c)==4)
+
+    s = tuple("?#?#?#?#?#?#?#?")
+    c = (1, 3, 1, 6)
+    num = fu(s, c)
+    assert num==1, f"expected 1 got {num}"
+
+
+    s = tuple("????.#...#...")
+    c = (4, 1, 1)
+    num = fu(s, c)
+    assert num==1, f"expected 1 got {num}"
+
+    s = tuple("????.######..#####.")
+    c = (1, 6, 5)
+    num = fu(s, c)
+    assert num==4, f"expected 4 got {num}"
+
+    s = tuple("?###????????")
+    c = (3, 2, 1)
+    num = fu(s, c)
+    assert num==10, f"expected 10 got {num}"
+
+    s = tuple("?###????????")
+    c = (3, 2, 1)
+    num = fu(s, c)
+    assert num==10, f"expected 10 got {num}"
+
+    print("test 2-1")
+    s = tuple("????.######..#####.")
+    c = (1,6,5)
+    s_p2 = (*s, '?', *s, '?', *s, '?', *s, '?', *s)
+    c_p2 = (*c, *c, *c, *c, *c)
+    num = fu(s_p2,c_p2)
+    assert num==2500,f"result is {num} not 2500"
+
+    print("test 2-2")
+    s = tuple("?###????????")
+    c = (3, 2, 1)
+    s_p2 = (*s, '?', *s, '?', *s, '?', *s, '?', *s)
+    c_p2 = (*c, *c, *c, *c, *c)
+    num = fu(s_p2,c_p2)
+    assert num==506250,f"result is {num} not 506250"
+
+    print("start solve")
     input_file = "./data/" + d + "_input.txt"
     p1, p2 = solve(input_file)
     print("{} part 1: {}".format(d,p1))
     print("{} part 2: {}".format(d,p2))
-
-
-    # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
-    # print(s.find_most_frequent(lst))
-    # print(s.find_occurances(lst)[4])
-    # print(s.find_even(lst))
-    # print(s.capitalize_words(["python", "javaScript", "c++"]))
