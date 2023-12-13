@@ -174,6 +174,23 @@ def parsegrid(lines):
             grid[(r,c)] = lines[r][c]
     return grid
 
+
+def lines_to_blocks(lines):
+    g = []
+    m = []
+    for l in lines:
+        r = 0
+        if l != "":
+            m.append(l)
+            r = r + 1
+        else:
+            g.append(m)
+            r = 0
+            m = []
+    g.append(m)
+    return g
+
+
 def a_star_algorithm(grid, start_node, stop_node, get_neighbors):
     # def get_neighbors(grid,p):
 
