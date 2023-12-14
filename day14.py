@@ -15,8 +15,9 @@ def solve(input):
 
     cache = []
     possible = []
+    iteration = 0
 
-    for i in range(200):
+    while len(possible) < 100:
         r = tilt_north_south(r, False)
         if p1 == 0:
             p1 = sum([(len(r) - i) * len([e for e in r[i] if e == "O"]) for i in range(len(r))])
@@ -27,8 +28,9 @@ def solve(input):
 
         w = sum([(len(r) - i) * len([e for e in r[i] if e == "O"]) for i in range(len(r))])
         if w in cache:
-            possible.append(i)
+            possible.append(iteration)
         cache.append(w)
+        iteration += 1
 
     possible = [possible[i] for i in range(len(possible)-1) if possible[i+1]==possible[i]+1]
 
@@ -40,6 +42,7 @@ def solve(input):
             pattern = possible[:k]
             break
 
+    print(s.find_repeating_sequence(cache)==pattern)
     p2 = pattern[(1000000000 - 1 - start) % len(pattern)]
     return p1, p2
 
@@ -59,11 +62,7 @@ def tilt_east_west(lines, is_east):
     new_rows = []
     for r in rows:
         chunks = str(r).split("#")
-        new_chunks = []
-        for chunk in chunks:
-            n = "".join(['O' for a in chunk if a == 'O']) + "".join(['.' for a in chunk if a == '.'])
-            new_chunks.append(n)
-        new_rows.append("#".join(new_chunks))
+        new_rows.append("#".join(["".join(['O' for a in chunk if a == 'O']) + "".join(['.' for a in chunk if a == '.']) for chunk in chunks]))
 
     if is_east:
         new_rows = [s.reverse_list(l) for l in new_rows]
@@ -79,12 +78,7 @@ def tilt_north_south(lines, is_south):
     new_cols = []
     for c in cols:
         chunks = str(c).split('#')
-        new_chunks = []
-        for chunk in chunks:
-            n = "".join(['O' for a in chunk if a == 'O']) + "".join(['.' for a in chunk if a == '.'])
-            new_chunks.append(n)
-        # print("#".join(new_chunks))
-        new_cols.append("#".join(new_chunks))
+        new_cols.append("#".join(["".join(['O' for a in chunk if a == 'O']) + "".join(['.' for a in chunk if a == '.']) for chunk in chunks]))
 
     if is_south:
         new_cols = [s.reverse_list(l) for l in new_cols]
@@ -101,7 +95,6 @@ if __name__ == '__main__':
     p1, p2 = solve(input_file)
     print("{} part 1: {}".format(d,p1))
     print("{} part 2: {}".format(d,p2))
-
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
     # print(s.find_most_frequent(lst))
     # print(s.find_occurances(lst)[4])
