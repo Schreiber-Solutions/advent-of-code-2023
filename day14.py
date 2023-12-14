@@ -2,6 +2,7 @@ import re
 import scrib as s
 import os
 from collections import namedtuple
+from timeit import default_timer as timer
 
 
 def solve(input):
@@ -18,13 +19,11 @@ def solve(input):
     iteration = 0
 
     while len(possible) < 100:
-        r = tilt_north_south(r, False)
         if p1 == 0:
-            p1 = sum([(len(r) - i) * len([e for e in r[i] if e == "O"]) for i in range(len(r))])
+            r1 = tilt_north_south(r, False)
+            p1 = sum([(len(r1) - i) * len([e for e in r1[i] if e == "O"]) for i in range(len(r1))])
 
-        r = tilt_east_west(r, False)
-        r = tilt_north_south(r, True)
-        r = tilt_east_west(r, True)
+        r = spin(r)
 
         w = sum([(len(r) - i) * len([e for e in r[i] if e == "O"]) for i in range(len(r))])
         if w in cache:
@@ -40,6 +39,19 @@ def solve(input):
         p2 = pattern[(1000000000 - 1 - start) % len(pattern)]
     return p1, p2
 
+
+map_cache = {}
+def spin(map):
+    k = "".join(map)
+    if k in map_cache.keys():
+        return map_cache[k]
+    r = map
+    r = tilt_north_south(r, False)
+    r = tilt_east_west(r, False)
+    r = tilt_north_south(r, True)
+    r = tilt_east_west(r, True)
+    map_cache[k] = r
+    return r
 
 
 def print_display(r):
@@ -86,9 +98,11 @@ if __name__ == '__main__':
     d = d[:len(d)-3]
 
     input_file = "./data/" + d + "_input.txt"
+    start = timer()
     p1, p2 = solve(input_file)
     print("{} part 1: {}".format(d,p1))
     print("{} part 2: {}".format(d,p2))
+    print("elapsed {}".format(timer()-start))
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
     # print(s.find_most_frequent(lst))
     # print(s.find_occurances(lst)[4])
