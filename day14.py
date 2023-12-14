@@ -20,7 +20,7 @@ def solve(input):
 
     while len(possible) < 100:
         if p1 == 0:
-            r1 = tilt_north_south(r, False)
+            r1 = tilt(r, 0)
             p1 = sum([(len(r1) - i) * len([e for e in r1[i] if e == "O"]) for i in range(len(r1))])
 
         r = spin(r)
@@ -49,10 +49,10 @@ def spin(map):
     if k in map_cache.keys():
         return map_cache[k]
     r = map
-    r = tilt_north_south(r, False)
-    r = tilt_east_west(r, False)
-    r = tilt_north_south(r, True)
-    r = tilt_east_west(r, True)
+
+    for i in range(4):
+        r = tilt(r,i)
+
     map_cache[k] = r
     return r
 
@@ -63,37 +63,27 @@ def print_display(r):
     print()
 
 
-def tilt_east_west(lines, is_east):
-    rows = lines
-    if is_east:
-        rows = [s.reverse_list(l) for l in rows]
+def tilt(lines,position):
+    # 0 north, 1 west, 2 south, 3 east
+    if position % 2 == 0:
+        lines = list(zip(*lines))
 
-    new_rows = []
-    for r in rows:
+    if position > 1:
+        lines = [s.reverse_list(l) for l in lines]
+
+    result = []
+    for r in lines:
         chunks = str(r).split("#")
-        new_rows.append("#".join(["".join(['O' for a in chunk if a == 'O']) + "".join(['.' for a in chunk if a == '.']) for chunk in chunks]))
+        result.append("#".join(["".join(['O' for a in chunk if a == 'O']) + "".join(['.' for a in chunk if a == '.']) for chunk in chunks]))
+    lines = result
 
-    if is_east:
-        new_rows = [s.reverse_list(l) for l in new_rows]
+    if position > 1:
+        lines = [s.reverse_list(l) for l in lines]
 
-    return new_rows
+    if position % 2 == 0:
+        lines = list(zip(*lines))
 
-
-def tilt_north_south(lines, is_south):
-    cols = list(zip(*lines))
-    if is_south:
-        cols = [s.reverse_list(l) for l in cols]
-
-    new_cols = []
-    for c in cols:
-        chunks = str(c).split('#')
-        new_cols.append("#".join(["".join(['O' for a in chunk if a == 'O']) + "".join(['.' for a in chunk if a == '.']) for chunk in chunks]))
-
-    if is_south:
-        new_cols = [s.reverse_list(l) for l in new_cols]
-
-    r = list(zip(*new_cols))
-    return r
+    return lines
 
 
 if __name__ == '__main__':
