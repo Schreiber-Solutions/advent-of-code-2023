@@ -22,11 +22,9 @@ def solve(input):
             p1 = sum([(len(r) - i) * len([e for e in r[i] if e == "O"]) for i in range(len(r))])
 
         r = tilt_east_west(r, False)
-
         r = tilt_north_south(r, True)
-
         r = tilt_east_west(r, True)
-        # print_display(r)
+
         w = sum([(len(r) - i) * len([e for e in r[i] if e == "O"]) for i in range(len(r))])
         if w in cache:
             possible.append(i)
@@ -43,27 +41,6 @@ def solve(input):
             break
 
     p2 = pattern[(1000000000 - 1 - start) % len(pattern)]
-
-    # p2 = [69, 69, 65, 64, 65, 63, 68][999971990 % 7]
-    # p2 =  [90212,
-    #          90217,
-    #          90213,
-    #          90200,
-    #          90188,
-    #          90177,
-    #          90176,
-    #          90182,
-    #          90198,
-    #          90211,
-    #          90218,
-    #          90212,
-    #          90201,
-    #          90187,
-    #          90178,
-    #          90175,
-    #          90183,
-    #          90197][(1000000000 - 1 - 363) % 18]
-
     return p1, p2
 
 
