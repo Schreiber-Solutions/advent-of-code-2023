@@ -40,9 +40,12 @@ def solve(input):
     return p1, p2
 
 
+def map_key(m):
+    return "".join(m)
+
 map_cache = {}
 def spin(map):
-    k = "".join(map)
+    k = map_key(map)
     if k in map_cache.keys():
         return map_cache[k]
     r = map
