@@ -187,9 +187,9 @@ def find_repeating_sequence(nums):
             h = int(len(sub)/len(sub[:k]))
             if h>1 and sub[:k]*h == sub[:h*k]:
                 pattern = sub[:k]
-                return pattern
+                return start+i, pattern
 
-    return []
+    return -1, []
 
 def lines_to_blocks(lines, divider = None):
 
