@@ -14,11 +14,11 @@ def solve(input):
 
     r = lines
 
-    cache = []
-    possible = []
+    nums = []
+    possible = 0
     iteration = 0
 
-    while len(possible) < 100:
+    while possible < 100:
         if p1 == 0:
             r1 = tilt(r, 0)
             p1 = sum([(len(r1) - i) * len([e for e in r1[i] if e == "O"]) for i in range(len(r1))])
@@ -26,12 +26,13 @@ def solve(input):
         r = spin(r)
 
         w = sum([(len(r) - i) * len([e for e in r[i] if e == "O"]) for i in range(len(r))])
-        if w in cache:
-            possible.append(iteration)
-        cache.append(w)
+        if w in nums:
+            possible += 1
+        nums.append(w)
+
         iteration += 1
 
-    start, pattern = s.find_repeating_sequence(cache)
+    start, pattern = s.find_repeating_sequence(nums)
     if start < 0:
         print("Unable to find pattern")
         p2 = -1
