@@ -8,9 +8,34 @@ def solve(input):
     with open(input) as f:
         lines = f.read().splitlines()
 
+    g = lines
     p1, p2 = 0, 0
 
+    r = tilt_north_south(lines, True)
+    for l in r:
+        print("".join(l))
+
+    p1 = sum([(len(r)-i)*len([e for e in r[i] if e == "O"]) for i in range(len(r))])
+    len(r)
     return p1, p2
+
+
+def tilt_north_south(lines, is_south):
+    cols = list(zip(*lines))
+    if is_south:
+        lines = [s.reverse_list(l) for l in lines]
+
+    new_cols = []
+    for c in cols:
+        chunks = str(c).split('#')
+        new_chunks = []
+        for chunk in chunks:
+            n = "".join(['O' for a in chunk if a == 'O']) + "".join(['.' for a in chunk if a == '.'])
+            new_chunks.append(n)
+        # print("#".join(new_chunks))
+        new_cols.append("#".join(new_chunks))
+    r = list(zip(*new_cols))
+    return r
 
 
 if __name__ == '__main__':

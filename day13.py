@@ -30,7 +30,6 @@ def check_v(m, exclude):
             many = min(abs(max_c - c - 2), c)
             if c != exclude and all(columns[c - i] == columns[c + 1 + i] for i in range(0, many + 1)):
                 return c
-
     return -1
 
 
@@ -48,7 +47,6 @@ def check_h(m, exclude):
 def solve(input):
     with open(input) as f:
         lines = f.read().splitlines()
-
     g = s.lines_to_blocks(lines)
 
     h = []
