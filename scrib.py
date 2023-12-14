@@ -176,7 +176,7 @@ def parsegrid(lines):
 
 def find_repeating_sequence(nums):
     possible = [i for i, n in enumerate(nums) if n in nums[0:i]]
-    possible = [possible[i] for i in range(len(possible)-1) if possible[i+1]==possible[i]+1]
+    possible = [possible[i] for i in range(len(possible)-1) if all([possible[k+1]-possible[k]==1 for k in range(i,len(possible)-1)])]
 
     start = possible[0]
     possible = [nums[p] for p in possible]
@@ -187,6 +187,7 @@ def find_repeating_sequence(nums):
             h = int(len(sub)/len(sub[:k]))
             if h>1 and sub[:k]*h == sub[:h*k]:
                 pattern = sub[:k]
+
                 return start+i, pattern
 
     return -1, []

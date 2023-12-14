@@ -32,8 +32,22 @@ def solve(input):
         cache.append(w)
         iteration += 1
 
+    # possible = [possible[i] for i in range(len(possible)-1) if possible[i+1]==possible[i]+1]
+    #
+    # start = possible[0]
+    # possible = [cache[p] for p in possible]
+    # pattern = []
+    # for k in range(1,len(possible)+1):
+    #     if possible[:k]*2 == possible[:2*k]:
+    #         pattern = possible[:k]
+    #         break
+
     start, pattern = s.find_repeating_sequence(cache)
-    p2 = pattern[(1000000000 - 1 - start) % len(pattern)]
+    if start < 0:
+        print("Unable to find pattern")
+        p2 = -1
+    else:
+        p2 = pattern[(1000000000 - 1 - start) % len(pattern)]
     return p1, p2
 
 
