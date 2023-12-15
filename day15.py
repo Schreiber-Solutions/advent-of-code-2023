@@ -26,22 +26,18 @@ def solve(input):
         op = re.search(r"[-|=]", l)
         op = op[0]
         # print(op)
+        h = my_hash(str(label))
+
         if op == "=":
             n = s.find_int(l)
-        else:
-            n = 0
-
-        h = my_hash(str(label))
-        if op[0] == "-":
-            if label in box[h]:
-                box[h].remove(label)
-
-        if op[0] == "=":
             if str(label) in box[h]:
                 cache[str(label)] = n
             else:
                 box[h].append(label)
                 cache[str(label)] = n
+        else:
+            if label in box[h]:
+                box[h].remove(label)
 
     p2 = 0
     for i, b in enumerate(box):
@@ -51,13 +47,11 @@ def solve(input):
     return v, p2
 
 
-def my_hash(l):
-    v = 0
-    for c in l:
-        v = v + ord(c)
-        v = v * 17
-        v = v % 256
-    return v
+def my_hash(l,acc=0):
+    if l:
+        return my_hash(l[1:],(acc+ord(l[0]))*17 % 256)
+    else:
+        return acc
 
 
 if __name__ == '__main__':
@@ -66,6 +60,8 @@ if __name__ == '__main__':
 
     input_file = "./data/" + d + "_input.txt"
     p1, p2 = solve(input_file)
+    assert(p1==508498)
+    assert(p2==279116)
     print("{} part 1: {}".format(d, p1))
     print("{} part 2: {}".format(d, p2))
 
