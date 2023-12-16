@@ -2,6 +2,7 @@ import re
 import scrib as s
 import os
 from collections import namedtuple
+from timeit import default_timer as timer
 
 
 def solve(input):
