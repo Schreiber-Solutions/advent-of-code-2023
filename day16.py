@@ -28,27 +28,28 @@ def solve(input):
     start = (0,0)
     start_dir = (0,1)
 
-    e = solve2(map, start, start_dir)
+    s = timer()
+    e = solve_old(map, start, start_dir)
     print("Part 1 {}".format(len(e)))
-
+    print("Elapsed {}".format(timer()-s))
     es = [-1]
 
     for r in range(len(map)):
         print("varying row {} max e {}".format(r, max(es)))
         start = (r,0)
 
-        es.append(len(r_solve(map,start,(0,1))))
+        es.append(len(solve2(map,start,(0,1))))
 
         start = (r,len(map[0])-1)
-        es.append(len(r_solve(map, start, (0, -1))))
+        es.append(len(solve2(map, start, (0, -1))))
 
     for c in range(len(map[0])):
         print("varying col {} max e {}".format(c, max(es)))
         start = (0,c)
-        es.append(len(r_solve(map,start,(1,0))))
+        es.append(len(solve2(map,start,(1,0))))
 
         start = (len(map)-1,c)
-        es.append(len(r_solve(map,start,(-1,0))))
+        es.append(len(solve2(map,start,(-1,0))))
 
     p1, p2 = len(e), max(es)
 
@@ -126,8 +127,6 @@ def solve2(map, start, start_dir):
     cycles = 0
     path = []
 
-    # while not all(b in path for b in beams):
-    # while not all([len(e) == l_e for i, l_e in enumerate(last_e)]):
     while beams:
         b = beams.pop()
         if (*b[0], *b[1]) in visited:
@@ -170,7 +169,63 @@ def solve2(map, start, start_dir):
 
     return e
 
+def solve_old(map, start, start_dir):
+    last_e = [-1]
+    e = {start}
+    beams = [[start, start_dir]]
+    cycles = 0
+    path = []
 
+    while beams:
+        path.extend(beams)
+        cycles = cycles + 1
+        new_beams = []
+
+        for index, b in enumerate(beams):
+            pos, dir = b
+
+            g = map[pos[0]][pos[1]]
+            # print(g, pos, dir, g == "\\" and dir in [(0,1),(0,-1)])
+            if g == "|" and dir in [(0, 1), (0, -1)]:
+                # make two
+                new_beams.append([pos, (1, 0)])
+                new_beams.append([pos, (-1, 0)])
+
+            elif g == "-" and dir in [(1, 0), (-1, 0)]:
+                # make two
+
+                new_beams.append([pos, (0, 1)])
+                new_beams.append([pos, (0, -1)])
+            elif g == "/" and dir in [(0, 1), (0, -1)]:
+                new_beams.append([pos, (dir[1] * -1, 0)])
+
+            elif g == "/" and dir in [(1, 0), (-1, 0)]:
+                new_beams.append([pos, (0, dir[0] * -1)])
+
+            # \
+            elif g == "\\" and dir in [(1, 0), (-1, 0)]:
+                new_beams.append([pos, (0, dir[0])])
+
+            elif g == "\\" and dir in [(0, 1), (0, -1)]:
+                new_beams.append([pos, (dir[1], 0)])
+
+            else:
+                new_beams.append([pos, dir])
+
+        beams = new_beams
+
+        new_beams = []
+        for index, b in enumerate(beams):
+            pos, dir = b
+
+            pos = add_point(pos, dir)
+            if pos[0] >= 0 and pos[0] < len(map) and pos[1] >= 0 and pos[1] < len(map[0]) and [pos, dir] not in path:
+                new_beams.append([pos, dir])
+
+        e.update([item[0] for item in new_beams])
+
+        beams = new_beams
+    return e
 
 if __name__ == '__main__':
     d = s.find_filename(__file__)
