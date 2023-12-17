@@ -29,7 +29,7 @@ def solve(input):
     start_dir = (0,1)
 
     s = timer()
-    e = solve_old(map, start, start_dir)
+    e = solve2(map, start, start_dir)
     print("Part 1 {}".format(len(e)))
     print("Elapsed {}".format(timer()-s))
     es = [-1]
