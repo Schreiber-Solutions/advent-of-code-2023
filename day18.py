@@ -10,6 +10,21 @@ directions = { 'D': (1,0), 'L': (0,-1), 'U': (-1,0), 'R': (0,1)}
 dir_list = ['D', 'L', 'U', 'R']
 def add_point(p1,p2):
     return (p1[0]+p2[0],p1[1]+p2[1])
+
+
+def shoelace(v):
+    sum = 0
+    for index in range(len(v)):
+        index_plus = (index + 1) % len(v)
+
+
+        sum += v[index][1]*v[index_plus][0] - v[index_plus][1]*v[index][0]
+
+        # print("(y_{}+y_{}) * (x_{}-x_{})".format(index, index_plus, index, index_plus))
+        # sum += (v[index][0] + v[index_plus][0])*(v[index][1]-v[index_plus][1])
+    return(sum/2)
+
+
 def solve(input):
     with open(input) as f:
         lines = f.read().splitlines()
@@ -22,6 +37,8 @@ def solve(input):
     open_list = set()
     closed_list = set()
 
+    v = (0,0)
+    vertices = [v]
     for l in lines:
         d, s, c = l.split()
         c = c[1:-1]
@@ -35,26 +52,51 @@ def solve(input):
             open_list.add(inside)
             closed_list.add(pos)
             visited.add((pos, c))
-    # print_grid(visited)
 
-    while len(open_list) > 0:
-        m = open_list.pop()
-        # print("Open",m)
-        # print("Open size {}".format(len(open_list)))
-        closed_list.add(m)
-        if m not in [v[0] for v in visited]:
-            for n in [add_point(m,a) for a in directions.values()]:
-                # print("Neighbor",n)
-                if n not in closed_list and n not in open_list and n not in [v[0] for v in visited]:
-                    open_list.add(n)
-            visited.add((m, None))
 
-    # print_grid(visited)
+        v = add_point(v,tuple([s*x for x in directions[d]]))
+        vertices.append(v)
 
-    p1 = len(set([v[0] for v in visited]))
+    # for t in range(len(vertices)):
+    #     test = vertices[:t]
+    #     print("Shoelace {}={}".format(test, shoelace(test)))
+    p1 = int(shoelace(vertices) + len(visited)/2 + 1)
+
+    v = (0,0)
+    vertices = [v]
+    perimiter = 0
+
+    for l in lines:
+        d, s, c = l.split()
+        c = c[1:-1]
+
+        s = int(c[1:6], 16)
+        d = dir_list[(int(c[6:]) + 3) % len(dir_list)]
+        perimiter += s
+        v = add_point(v,tuple([s*x for x in directions[d]]))
+        print("{} {}".format(d,s))
+        vertices.append(v)
+
+    p2 = int(shoelace(vertices) + perimiter/2 + 1)
+
+    # while len(open_list) > 0:
+    #     m = open_list.pop()
+    #     # print("Open",m)
+    #     # print("Open size {}".format(len(open_list)))
+    #     closed_list.add(m)
+    #     if m not in [v[0] for v in visited]:
+    #         for n in [add_point(m,a) for a in directions.values()]:
+    #             # print("Neighbor",n)
+    #             if n not in closed_list and n not in open_list and n not in [v[0] for v in visited]:
+    #                 open_list.add(n)
+    #         visited.add((m, None))
+    #
+    # # print_grid(visited)
+    #
+    # p1 = len(set([v[0] for v in visited]))
     return p1, p2
 
-    # 9177 too low
+
 def print_grid(visited):
     max_r = max([v[0][0] for v in visited])
     max_c = max([v[0][1] for v in visited])
