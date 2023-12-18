@@ -33,10 +33,26 @@ def neighbors_v2(g, p):
         elif len(p) == most_dir and all([new_p[1] == item for index, item in enumerate(p) if index % 2 == 1]):
             continue
         elif new_p[0] >= 0 and new_p[0] < len(g) and new_p[1] >= 0 and new_p[1] < len(g[0]):
-            if len(p) > 1 and all([new_p[0] == item for index, item in enumerate(p[:4]) if index % 2 == 0]):
+            if len(p) == 2:
                 ret.append((*new_p, *path))
-            elif len(p) > 1 and all([new_p[1] == item for index, item in enumerate(p[:4]) if index % 2 == 1]):
-                ret.append((*new_p, *path))
+            elif len(p) > 2 and all([new_p[0] == item for index, item in enumerate(p[:4]) if index % 2 == 0]):
+                if len([item for index, item in enumerate(p[:min_dir]) if index % 2 == 0 and new_p[0] == item])==2 and \
+                        new_p[1]+3 <= len(g[0]) and \
+                        p[1] > p[3]:
+                    for i in range(new_p[1],new_p[1]+3):
+                        path = (new_p[0], i, *path)
+                    ret.append(path[:most_dir-2])
+                else:
+                    ret.append((*new_p, *path))
+            elif len(p) > 2 and all([new_p[1] == item for index, item in enumerate(p[:4]) if index % 2 == 1]):
+                if len([item for index, item in enumerate(p[:min_dir]) if index % 2 == 1 and new_p[1] == item]) == 2 and \
+                        new_p[0]+3 <= len(g) and \
+                        p[0] > p[2]:
+                    for i in range(new_p[0], new_p[0] + 3):
+                        path = (i, new_p[1], *path)
+                    ret.append(path[:most_dir - 2])
+                else:
+                    ret.append((*new_p, *path))
             elif len([item for index, item in enumerate(p[:min_dir]) if index % 2 == 0 and p[0]==item])==min_blocks+1:
                 ret.append((*new_p, *path))
             elif len([item for index, item in enumerate(p[:min_dir]) if index % 2 == 1 and p[1]==item])==min_blocks+1:
@@ -86,6 +102,27 @@ def neighbors(g, p):
 
     return ret
 
+def heuristic(p,end):
+    # print("called h on {}".format(p))
+    return s.distance((p[0],p[1]),end)
+
+def gap_weight(g, p1, p2):
+    retval = 0
+    if p1[0] == p2[0] and p1[1] != p2[1]:
+        a = sorted([p1[1],p2[1]])
+        a[0] = a[0] + 1
+        for i in range(*a):
+            retval += int(g[p1[0]][i])
+
+    if p1[0] != p2[0] and p1[1] == p2[1]:
+        a = sorted([p1[0],p2[0]])
+        a[0] = a[0] + 1
+
+        for i in range(*a):
+            retval += int(g[i][p1[1]])
+
+    return retval
+
 def a_star_algorithm(grid, start_node, stop_node, get_neighbors, validate):
     # def get_neighbors(grid,p):
 
@@ -109,11 +146,12 @@ def a_star_algorithm(grid, start_node, stop_node, get_neighbors, validate):
 
         # find a node with the lowest value of f() - evaluation function
         for v in open_list:
-            if n is None or g[v] < g[n]:
+            if n is None or g[v] + heuristic(v,stop_node) < g[n] + heuristic(n,stop_node):
                 n = v
 
         # print("n",n)
-        # print(len(open_list))
+        if len(open_list) % 1000 == 0:
+            print(len(open_list))
         # print("Open List", open_list)
         # print("Closed List", closed_list)
         # print("Current g", g)
@@ -146,7 +184,7 @@ def a_star_algorithm(grid, start_node, stop_node, get_neighbors, validate):
                 # print("adding {} to open list with parent {}".format(m,n))
                 open_list.add(m)
                 parents[m] = n
-                g[m] = g[n] + int(grid[m[0]][m[1]])
+                g[m] = g[n] + int(grid[m[0]][m[1]]) + gap_weight(grid,m,n)
 
             # otherwise, check if it's quicker to first visit n, then m
             # and if it is, update parent data and g data
@@ -154,8 +192,8 @@ def a_star_algorithm(grid, start_node, stop_node, get_neighbors, validate):
             else:
                 # print("neighbor {} has {} where {} has {}".format(m, g[m], n, g[n]))
                 weight = int(grid[m[0]][m[1]])
-                if g[m] > g[n] + weight:
-                    g[m] = g[n] + weight
+                if g[m] > g[n] + weight + gap_weight(grid,m,n):
+                    g[m] = g[n] + weight  + gap_weight(grid,m,n)
                     parents[m] = n
 
                     if m in closed_list:
@@ -181,24 +219,25 @@ def solve(input):
     start_n = (0,0)
     stop_n = (len(grid)-1,len(grid[0])-1)
 
-    # p = ()
+    p = ()
     # for i in range(0,11):
     #     p = (0, i, *p)
     #     print(p,neighbors_v2(grid, p))
-    #
+    #     for n in neighbors_v2(grid, p):
+    #         print("gap weight {} and {} is {}".format(n,p,gap_weight(grid,n,p)))
     # return 0,0
-    # print(neighbors(grid, (0,2), [(0,0), (0,1)]))
-    res = a_star_algorithm(grid, start_n, stop_n, neighbors, validate_p1)
 
-    for r, row in enumerate(grid):
-        for c, col in enumerate(row):
-            if (r,c) in [(item[0],item[1]) for item in res[1:]]:
-                print("X", end="")
-            else:
-                print(col, end="")
-        print()
-    print()
-    p1 = sum([int(grid[item[0]][item[1]]) for item in res[1:] ])
+    # res = a_star_algorithm(grid, start_n, stop_n, neighbors, validate_p1)
+    #
+    # for r, row in enumerate(grid):
+    #     for c, col in enumerate(row):
+    #         if (r,c) in [(item[0],item[1]) for item in res[1:]]:
+    #             print("X", end="")
+    #         else:
+    #             print(col, end="")
+    #     print()
+    # print()
+    # p1 = sum([int(grid[item[0]][item[1]]) for item in res[1:] ])
 
     res = a_star_algorithm(grid, start_n, stop_n, neighbors_v2, validate_p2)
 
@@ -209,7 +248,13 @@ def solve(input):
             else:
                 print(col, end="")
         print()
-    p2 = sum([int(grid[item[0]][item[1]]) for item in res[1:] ])
+
+    print([item[:2] for item in res[1:]])
+    gap_weights = sum([gap_weight(grid,item,res[index-1]) for index, item in enumerate(res) if index > 0])
+    weights = sum([int(grid[item[0]][item[1]]) for item in res[1:] ])
+    print(weights)
+    p2 = weights + gap_weights
+    # 1267 is too high
 
     return p1, p2
 #931 too high
