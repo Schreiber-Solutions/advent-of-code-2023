@@ -74,7 +74,7 @@ def solve(input):
         d = dir_list[(int(c[6:]) + 3) % len(dir_list)]
         perimiter += s
         v = add_point(v,tuple([s*x for x in directions[d]]))
-        print("{} {}".format(d,s))
+
         vertices.append(v)
 
     p2 = int(shoelace(vertices) + perimiter/2 + 1)
