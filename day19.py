@@ -30,17 +30,11 @@ def solve(input):
         while not b_done:
             for c in w: # condition
                 result = c[0]
-                if len(c) > 1:
-                    next = c[1]
-                    for v in coords:
-                        result = result.replace(v,str(coords[v]))
-
-                else:
-                    next = c[0]
-                    result = "True"
+                next = c[1]
+                for v in coords:
+                    result = result.replace(v,str(coords[v]))
 
                 if eval(result):
-
                     if next == "A":
                         p1 += sum(coords.values())
                         b_done = True
@@ -103,15 +97,12 @@ def find_conditions(workflows, target):
                 if c[0] != "True":
                         prev_cond.append(c[0])
 
-                # ret_val.append(prev_cond)
-
-                gen = find_conditions(workflows, w)
-                if len(gen) == 0:
-                    ret_val.append (prev_cond)
+                if w == "in":
+                    yield prev_cond
                 else:
-                    for g in gen:
-                        ret_val.append([*g, *prev_cond])
-    return ret_val
+                    for g in find_conditions(workflows, w):
+                        yield [*g, *prev_cond]
+
 
 if __name__ == '__main__':
     d = s.find_filename(__file__)
