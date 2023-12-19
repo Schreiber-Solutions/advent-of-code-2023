@@ -7,6 +7,7 @@ from timeit import default_timer as timer
 def add_p(p1, p2):
     return (p1[0]+p2[0],p1[1]+p2[1])
 
+start = timer()
 def neighbors_v2(g, p):
     # p is a tuple with at most three sets of paired coordinates - the last being my current point
     most_blocks = 10
@@ -14,14 +15,17 @@ def neighbors_v2(g, p):
     min_blocks = 4
     min_dir = min_blocks * 2 + 2
 
+    max_r = len(g)
+    max_c = len(g[0])
+
     ret = []
     if len(p) < 2:
         raise "Error"
     r, c = p[0], p[1]
-    path = p[:most_dir-2]
 
-    for i in [(1,0), (0,1), (-1,0), (0, -1)]:
-        new_p = add_p((r,c), i)
+    for dxdy in [(1,0), (0,1), (-1,0), (0, -1)]:
+        path = p[:most_dir - 2]
+        new_p = add_p((r,c), dxdy)
 
         # print(path)
         # print(path[len(path)-2:])
@@ -32,9 +36,19 @@ def neighbors_v2(g, p):
             continue
         elif len(p) == most_dir and all([new_p[1] == item for index, item in enumerate(p) if index % 2 == 1]):
             continue
+
         elif new_p[0] >= 0 and new_p[0] < len(g) and new_p[1] >= 0 and new_p[1] < len(g[0]):
-            if len(p) == 2:
-                ret.append((*new_p, *path))
+            if len(p) == 2 and new_p[1] == p[1]:
+                for i in range(new_p[0], new_p[0] + min_blocks):
+                    path = (i, new_p[1], *path)
+                ret.append(path[:most_dir - 2])
+
+            elif len(p) == 2 and new_p[0] == p[0]:
+                for i in range(new_p[1], new_p[1] + min_blocks):
+                    path = (new_p[0], i, *path)
+
+                ret.append(path[:most_dir - 2])
+
             elif len(p) > 2 and all([new_p[0] == item for index, item in enumerate(p[:4]) if index % 2 == 0]):
                 if len([item for index, item in enumerate(p[:min_dir]) if index % 2 == 0 and new_p[0] == item])==2 and \
                         new_p[1]+3 <= len(g[0]) and \
@@ -53,10 +67,36 @@ def neighbors_v2(g, p):
                     ret.append(path[:most_dir - 2])
                 else:
                     ret.append((*new_p, *path))
+
             elif len([item for index, item in enumerate(p[:min_dir]) if index % 2 == 0 and p[0]==item])==min_blocks+1:
-                ret.append((*new_p, *path))
+                # met the minimum moves in same row
+                if new_p[0] == p[0]:
+                    ret.append((*new_p, *path))
+                elif new_p[0] > p[0]:
+                    for i in range(new_p[0], min(new_p[0] + min_blocks, max_r)):
+                        path = (i, new_p[1], *path)
+                    ret.append(path[:most_dir - 2])
+
+                else:
+                    for i in range(new_p[0], max(new_p[0] - min_blocks,0), -1):
+                        path = (i, new_p[1], *path)
+                    ret.append(path[:most_dir - 2])
+
             elif len([item for index, item in enumerate(p[:min_dir]) if index % 2 == 1 and p[1]==item])==min_blocks+1:
-                ret.append((*new_p, *path))
+                # met the minimum moves in same column
+                if new_p[1] == p[1]:
+                    ret.append((*new_p, *path))
+                elif new_p[1] > p[1]:
+                    for i in range(new_p[1], min(new_p[1] + min_blocks, max_c)):
+                        path = (new_p[0], i, *path)
+
+                    ret.append(path[:most_dir - 2])
+
+                else:
+                    for i in range(new_p[1], max(new_p[1] - min_blocks, 0), -1):
+                        path = (new_p[0], i, *path)
+
+                    ret.append(path[:most_dir - 2])
 
     return ret
 
@@ -151,7 +191,7 @@ def a_star_algorithm(grid, start_node, stop_node, get_neighbors, validate):
 
         # print("n",n)
         if len(open_list) % 1000 == 0:
-            print(len(open_list))
+            print("Open count {}, {} seconds".format(len(open_list), timer()-start))
         # print("Open List", open_list)
         # print("Closed List", closed_list)
         # print("Current g", g)
@@ -219,7 +259,7 @@ def solve(input):
     start_n = (0,0)
     stop_n = (len(grid)-1,len(grid[0])-1)
 
-    p = ()
+    # p = ()
     # for i in range(0,11):
     #     p = (0, i, *p)
     #     print(p,neighbors_v2(grid, p))
