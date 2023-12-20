@@ -182,16 +182,16 @@ def a_star_algorithm(grid, start_node, stop_node, get_neighbors, validate):
     parents = {start_node: start_node}
 
     while len(open_list) > 0:
-        n = None
+        n = open_list.pop()
 
         # find a node with the lowest value of f() - evaluation function
-        for v in open_list:
-            if n is None or g[v] + heuristic(v,stop_node) < g[n] + heuristic(n,stop_node):
-                n = v
+        # for v in open_list:
+        #     if n is None or g[v] + heuristic(v,stop_node) < g[n] + heuristic(n,stop_node):
+        #         n = v
 
         # print("n",n)
-        if len(open_list) % 1000 == 0:
-            print("Open count {}, {} seconds".format(len(open_list), timer()-start))
+        # if len(open_list) % 1000 == 0:
+        #     print("Open count {}, {} seconds".format(len(open_list), timer()-start))
         # print("Open List", open_list)
         # print("Closed List", closed_list)
         # print("Current g", g)
@@ -199,21 +199,6 @@ def a_star_algorithm(grid, start_node, stop_node, get_neighbors, validate):
         if n is None:
             print('Path does not exist!')
             return None
-
-        # if the current node is the stop_node
-        # then we begin reconstructin the path from it to the start_node
-        if (n[0],n[1]) == stop_node and validate(n):
-            reconst_path = []
-
-            while parents[n] != n:
-                reconst_path.append(n)
-                n = parents[n]
-
-            reconst_path.append(start_node)
-
-            reconst_path.reverse()
-
-            return reconst_path
 
         # for all neighbors of the current node do
         for m in get_neighbors(grid,n):
@@ -242,9 +227,19 @@ def a_star_algorithm(grid, start_node, stop_node, get_neighbors, validate):
 
         # remove n from the open_list, and add it to closed_list
         # because all of his neighbors were inspected
-        open_list.remove(n)
+        # open_list.remove(n)
         closed_list.add(n)
 
+    hl = min([w for (p, w) in g.items() if (p[0],p[1])==stop_node and validate(p)])
+    n = [p for (p, w) in g.items() if (p[0],p[1])==stop_node and w == hl][0]
+    reconst_path = []
+    while parents[n] != n:
+        reconst_path.append(n)
+        n = parents[n]
+
+    reconst_path.append(start_node)
+    reconst_path.reverse()
+    return reconst_path
     # print('Path does not exist!')
     return None
 
@@ -259,27 +254,7 @@ def solve(input):
     start_n = (0,0)
     stop_n = (len(grid)-1,len(grid[0])-1)
 
-    # p = ()
-    # for i in range(0,11):
-    #     p = (0, i, *p)
-    #     print(p,neighbors_v2(grid, p))
-    #     for n in neighbors_v2(grid, p):
-    #         print("gap weight {} and {} is {}".format(n,p,gap_weight(grid,n,p)))
-    # return 0,0
-
-    # res = a_star_algorithm(grid, start_n, stop_n, neighbors, validate_p1)
-    #
-    # for r, row in enumerate(grid):
-    #     for c, col in enumerate(row):
-    #         if (r,c) in [(item[0],item[1]) for item in res[1:]]:
-    #             print("X", end="")
-    #         else:
-    #             print(col, end="")
-    #     print()
-    # print()
-    # p1 = sum([int(grid[item[0]][item[1]]) for item in res[1:] ])
-
-    res = a_star_algorithm(grid, start_n, stop_n, neighbors_v2, validate_p2)
+    res = a_star_algorithm(grid, start_n, stop_n, neighbors, validate_p1)
 
     for r, row in enumerate(grid):
         for c, col in enumerate(row):
@@ -288,6 +263,18 @@ def solve(input):
             else:
                 print(col, end="")
         print()
+    print()
+    p1 = sum([int(grid[item[0]][item[1]]) for item in res[1:] ])
+
+    res = a_star_algorithm(grid, start_n, stop_n, neighbors_v2, validate_p2)
+
+    # for r, row in enumerate(grid):
+    #     for c, col in enumerate(row):
+    #         if (r,c) in [(item[0],item[1]) for item in res[1:]]:
+    #             print("X", end="")
+    #         else:
+    #             print(col, end="")
+    #     print()
 
     print([item[:2] for item in res[1:]])
     gap_weights = sum([gap_weight(grid,item,res[index-1]) for index, item in enumerate(res) if index > 0])
@@ -304,10 +291,11 @@ if __name__ == '__main__':
     d = d[:len(d)-3]
 
     input_file = "./data/" + d + "_input.txt"
+    start = timer()
     p1, p2 = solve(input_file)
     print("{} part 1: {}".format(d,p1))
     print("{} part 2: {}".format(d,p2))
-
+    print("Elapsed time {}".format(timer()-start))
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
     # print(s.find_most_frequent(lst))
     # print(s.find_occurances(lst)[4])
