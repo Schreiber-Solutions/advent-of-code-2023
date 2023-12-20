@@ -47,15 +47,15 @@ def solve(input):
             modules[m] = (m_type, m_dest, None)
 
 
-    print(modules)
-    print(inputs)
-
     hi_count = 0
     lo_count = 0
     p1, p2 = 0, 0
     last = {}
     last_count = {}
     numbers = set()
+    # seeking the inputs for the endpoint (rx)
+    endpoint = "rx"
+    seeking = inputs[endpoint][0]
 
     for count in range(10000):
         signals = deque()
@@ -77,8 +77,8 @@ def solve(input):
             if count == 999:
                 p1 = hi_count * lo_count
 
-            # m_state ?
-            if module == "rx" and s == 0:
+            # the final state we will never see
+            if module == endpoint and s == 0:
                 p2 = count
                 return p1, p2
 
@@ -107,19 +107,19 @@ def solve(input):
                         signals.append((1, module, d))
                 modules[module] = (m_type, m_dest, m_state)
 
-            # if not all([v==0 for v in modules['mg'][2].values()]):
-            if modules['mg'][2] != last:
+            # if state of the inputs of my endpoint changes
+            if modules[seeking][2] != last:
                 if len(last) > 0:
-                    which_changed = [k for k, v in modules['mg'][2].items() if v != last[k]][0]
+                    # find which changed and record it's periodic count in a collection of numbers
+                    which_changed = [k for k, v in modules[seeking][2].items() if v != last[k]][0]
                     if which_changed in last_count.keys() and last_count[which_changed] != count:
-                        # print(which_changed, count-last_count[which_changed])
                         numbers.add(count-last_count[which_changed])
                     last_count[which_changed] = count
 
-                    if len(numbers) == len(last):
+                    if len(numbers) == len(last): # if we have them all, find the LCM
                         p2 = math.lcm(*numbers)
-                last = {k:v for k, v in modules['mg'][2].items()}
-                # print(count, [(d, modules[d][2]) for d in inputs["rx"]])
+                last = {k:v for k, v in modules[seeking][2].items()}
+
     return p1, p2
 
 
