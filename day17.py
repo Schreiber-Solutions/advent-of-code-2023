@@ -256,14 +256,14 @@ def solve(input):
 
     res = a_star_algorithm(grid, start_n, stop_n, neighbors, validate_p1)
 
-    for r, row in enumerate(grid):
-        for c, col in enumerate(row):
-            if (r,c) in [(item[0],item[1]) for item in res[1:]]:
-                print("X", end="")
-            else:
-                print(col, end="")
-        print()
-    print()
+    # for r, row in enumerate(grid):
+    #     for c, col in enumerate(row):
+    #         if (r,c) in [(item[0],item[1]) for item in res[1:]]:
+    #             print("X", end="")
+    #         else:
+    #             print(col, end="")
+    #     print()
+    # print()
     p1 = sum([int(grid[item[0]][item[1]]) for item in res[1:] ])
 
     res = a_star_algorithm(grid, start_n, stop_n, neighbors_v2, validate_p2)
