@@ -178,17 +178,18 @@ def find_repeating_sequence(nums):
     possible = [i for i, n in enumerate(nums) if n in nums[0:i]]
     possible = [possible[i] for i in range(len(possible)-1) if all([possible[k+1]-possible[k]==1 for k in range(i,len(possible)-1)])]
 
-    start = possible[0]
-    possible = [nums[p] for p in possible]
-    pattern = []
-    for i in range(len(possible)):
-        sub = possible[i:]
-        for k in range(2,len(sub)+1):
-            h = int(len(sub)/len(sub[:k]))
-            if h>1 and sub[:k]*h == sub[:h*k]:
-                pattern = sub[:k]
+    if len(possible) > 0:
+        start = possible[0]
+        possible = [nums[p] for p in possible]
+        pattern = []
+        for i in range(len(possible)):
+            sub = possible[i:]
+            for k in range(2,len(sub)+1):
+                h = int(len(sub)/len(sub[:k]))
+                if h>1 and sub[:k]*h == sub[:h*k]:
+                    pattern = sub[:k]
 
-                return start+i, pattern
+                    return start+i, pattern
 
     return -1, []
 
