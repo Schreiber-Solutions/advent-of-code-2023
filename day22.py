@@ -41,7 +41,6 @@ def solve(input):
 
     base_layer = layers.copy()
 
-    # for each_brick in range(len(bricks)):
     for each_brick in range(len(bricks)):
         layers, max_z = fell_bricks([b for index, b in enumerate(bricks) if index != each_brick])
         b_fell = set()
@@ -94,7 +93,9 @@ if __name__ == '__main__':
     d = d[:len(d)-3]
 
     input_file = "./data/" + d + "_input.txt"
+    start = timer()
     p1, p2 = solve(input_file)
+    print("Elapsed {}".format(timer()-start))
     print("{} part 1: {}".format(d,p1))
     print("{} part 2: {}".format(d,p2))
 
