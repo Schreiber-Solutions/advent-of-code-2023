@@ -11,6 +11,8 @@ def grid_get(grid, r, c):
             return grid[r][c]
         elif grid[r][c] == 'S':
             return "."
+        else:
+            return "#"
     else:
         return "#"
 
@@ -21,7 +23,15 @@ def finder(grid, start, length):
     points = set()
 
     if (start, length) in cache.keys():
-        return cache[(start,length)]
+        return cache[(start,length)][0]
+
+    # options = [k[1] for k in cache.keys() if k[0] == start and k[1] < length and k[1] % 2 == length % 2]
+    # if options:
+    #     print("Found options {},{} for {}".format(start, length, options))
+    #     points, visited = cache[(start,max(options))]
+    #     print("Visited for {},{} len {} is {}".format(start, max(options), len(visited), visited))
+    #     open = {v for v in visited if visited[v] == max(visited.values())}
+    #     print("Starting with points {}".format(points))
 
     if length == 0:
         return points
@@ -61,7 +71,7 @@ def finder(grid, start, length):
                     points.add((mr+dr, mc + dc))
 
     # print(points)
-    cache[(start,length)] = points
+    cache[(start,length)] = [points, visited]
 
     return points
 
@@ -72,19 +82,32 @@ def solve(input):
     p1, p2 = 0, 0
     start_node = [(r,c) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if lines[r][c] == "S"][0]
 
-    p1 = len(finder(lines, start_node, 6))
-    last = 0
-    nums = []
-    for l in range(1,10):
-        f = len(finder(lines, start_node, len(lines)*l))
-        print("{} - {} - {}".format(l,f, f-last) )
-        nums.append(f-last)
-        last = f
+    start = timer()
+    print(6, len(finder(lines, start_node, 6)), timer()-start)
+    print(10, len(finder(lines, start_node, 10)), timer()-start)
+    print(50, len(finder(lines, start_node, 50)), timer()-start)
+    print(100, len(finder(lines, start_node, 100)), timer()-start)
+    print(500, len(finder(lines, start_node, 500)), timer()-start)
 
-    index, pattern = s.find_repeating_sequence(nums)
-    if index > 0:
-        print(index,pattern)
+    return 0,0
+    # p1 = len(finder(lines, start_node, 64))
+    # p2 = finder(lines, start_node, 100)
 
+
+    for i in range(101, 200, 2):
+        tmp = int(i/len(lines))+1
+        print("{}:".format(i))
+        tmp_points = finder(lines, start_node, i)
+        for r_offset in range(-tmp,tmp+1):
+            for c_offset in range(-tmp,tmp+1):
+                all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
+                print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
+            print()
+        print()
+
+
+    p2 = len(p2)
+    #  3113198559 (too low)
     # min_r = min([r for r,c in p2])
     # max_r = max([r for r,c in p2])
     # min_c = min([c for r,c in p2])
