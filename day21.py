@@ -17,21 +17,26 @@ def grid_get(grid, r, c):
         return "#"
 
 cache = {}
-def finder(grid, start, length):
+
+
+def finder(grid, start, length, use_cache=True):
     open = { (start) }
     visited = {start: 0}
     points = set()
 
-    if (start, length) in cache.keys():
-        return cache[(start,length)][0]
+    if (start, length) in cache.keys() and use_cache:
+        points, visited = cache[(start,length)]
+        return points
 
-    # options = [k[1] for k in cache.keys() if k[0] == start and k[1] < length and k[1] % 2 == length % 2]
-    # if options:
-    #     print("Found options {},{} for {}".format(start, length, options))
-    #     points, visited = cache[(start,max(options))]
-    #     print("Visited for {},{} len {} is {}".format(start, max(options), len(visited), visited))
-    #     open = {v for v in visited if visited[v] == max(visited.values())}
-    #     print("Starting with points {}".format(points))
+    # if use_cache:
+    #     options = [k[1] for k in cache.keys() if k[0] == start and k[1] < length and k[1] % 2 == length % 2]
+    #     if options:
+    #         # print("Found options {},{} for {}".format(start, length, options))
+    #         points, visited = cache[(start,max(options))]
+    #         # print("Visited for {},{} len {} is {}".format(start, max(options), len(visited), visited))
+    #         open = {v for v in visited if visited[v] == max(visited.values())}
+    #         # print("Starting with points {}, len {}".format(points, len(points)))
+    #         # print("Open ", open)
 
     if length == 0:
         return points
@@ -48,12 +53,12 @@ def finder(grid, start, length):
                     offset_r = mr+dr-tmp[0]
                     offset_c = mc+dc-tmp[1]
                     if grid_get(grid, *tmp) != "#":
-                        beyond = [(offset_r+p[0],offset_c+p[1]) for p in finder(grid, tmp, tmp_length)]
-                        # print(beyond)
+                        beyond = [(offset_r+p[0],offset_c+p[1]) for p in finder(grid, tmp, tmp_length, use_cache)]
+                        # print("beyond {}".format([b for b in beyond if b not in points]))
                         points.update(beyond)
 
-                    if (visited[(mr, mc)] + 1) % 2 == length % 2:
-                        points.add((mr + dr, mc + dc))
+                    # if (visited[(mr, mc)] + 1) % 2 == length % 2:
+                    #     points.add((mr + dr, mc + dc))
 
             elif grid_get(grid, mr + dr, mc + dc) != "#" and visited[(mr,mc)] + 1 <= length:
                 # if int((visited[(mr,mc)] + 1) / 100) ==(visited[(mr,mc)] + 1) / 100:
@@ -82,12 +87,38 @@ def solve(input):
     p1, p2 = 0, 0
     start_node = [(r,c) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if lines[r][c] == "S"][0]
 
+
+    for l in range(100,103):
+        v1 = len(finder(lines, start_node, l, True))
+        v2 = len(finder(lines, start_node, l, True))
+        print("Item {} is {} v {}".format(l,v1,v2))
+    # l = 100
+    # result = finder(lines, start_node, l)
+    # count_blocks = 0
+    # spaces = 0
+    # start = (5,5)
+    # for r in range(start[0]-l, start[0]+l+1):
+    #     for c in range(start[1]-l, start[1]+l+1):
+    #         if s.distance((r,c),start) <= l:
+    #             if (r,c) in result:
+    #                 print("O", end="")
+    #             else:
+    #                 print(lines[r % len(lines)][c % len(lines[0])], end="")
+    #             if (r+c) % 2 == l % 2:
+    #                 if lines[r % len(lines)][c % len(lines[0])] == "#":
+    #                     count_blocks += 1
+    #                 spaces += 1
+    #         else:
+    #             print(" ", end="")
+    #     print()
+    # print("total = {}, Blocks = {}, result = {}".format(spaces, count_blocks, len(result)-1))
+
     start = timer()
-    print(6, len(finder(lines, start_node, 6)), timer()-start)
-    print(10, len(finder(lines, start_node, 10)), timer()-start)
-    print(50, len(finder(lines, start_node, 50)), timer()-start)
-    print(100, len(finder(lines, start_node, 100)), timer()-start)
-    print(500, len(finder(lines, start_node, 500)), timer()-start)
+    # print(6, len(finder(lines, start_node, 6)), timer()-start)
+    # print(10, len(finder(lines, start_node, 10)), timer()-start)
+    # print(100, len(finder(lines, start_node, 100)), timer()-start)
+    # print(500, len(finder(lines, start_node, 500)), timer()-start)
+
 
     return 0,0
     # p1 = len(finder(lines, start_node, 64))
