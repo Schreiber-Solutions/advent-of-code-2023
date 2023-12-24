@@ -48,11 +48,11 @@ def my_solve(input):
         position = [int(n) for n in position.split(", ")]
         velocity = [int(n) for n in velocity.split(", ")]
         asteroids.append((position, velocity))
-    test_min = 7 # 200000000000000
-    test_max = 27 # 400000000000000
+    # test_min = 7 # 200000000000000
+    # test_max = 27 # 400000000000000
 
-    # test_min = 200000000000000
-    # test_max = 400000000000000
+    test_min = 200000000000000
+    test_max = 400000000000000
 
     for index, a in enumerate(asteroids):
         for b in asteroids[index+1:]:
@@ -78,7 +78,7 @@ def my_solve(input):
                     t2 = s[t2]
 
                     if t1 > 0 and t2 > 0:
-                        print(">>>>> ",b_x, b_y, a_x, a_y, t1, t2)
+                        # print(">>>>> ",b_x, b_y, a_x, a_y, t1, t2)
                         p1 += 1
 
     # a, b, c = asteroids[:3]
@@ -91,7 +91,7 @@ def my_solve(input):
 
     x, y, z, vx, vy, vz = symbols('x,y,z,vx,vy,vz')
     equations = []
-    for a in asteroids:
+    for a in asteroids[:5]:
         a_x, a_y, a_z = a[0]
         a_vx, a_vy, a_vz = a[1]
         eq1 = Eq((a_x-x)*(vy-a_vy),(a_y-y)*(vx-a_vx))
@@ -119,10 +119,11 @@ if __name__ == '__main__':
     d = d[:len(d)-3]
 
     input_file = "./data/" + d + "_input.txt"
+    start = timer()
     p1, p2 = my_solve(input_file)
     print("{} part 1: {}".format(d,p1))
     print("{} part 2: {}".format(d,p2))
-
+    print("Elapsed {} s".format(timer()-start))
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
     # print(s.find_most_frequent(lst))
     # print(s.find_occurances(lst)[4])
