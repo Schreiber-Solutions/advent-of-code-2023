@@ -80,6 +80,58 @@ def finder(grid, start, length, use_cache=True):
 
     return points
 
+def part2():
+    grid = set()
+    free = set()
+
+    x = 0
+    for y, l in enumerate(open("data/day21_input.txt")):
+        for x, c in enumerate(l):
+            if c == "#":
+                grid.add(x + y * 1j)
+            elif c == "S":
+                start = x + y * 1j
+            elif c == ".":
+                free.add(x + y * 1j)
+
+    deltas = [1, -1, -1j, 1j]
+
+    reach = {0: set([start])}
+
+    grid_len = x + 1
+
+    pts = []
+    target_time = 26501365
+    while len(pts) < 3:
+        steps = max(reach.keys())
+
+        if steps - 1 in reach:
+            del reach[steps - 1]
+
+        reach[steps + 1] = set()
+
+        for pos in reach[steps]:
+            for d in deltas:
+                npt = pos + d
+                nx = npt.real % grid_len
+                ny = npt.imag % grid_len
+                if nx + ny * 1j not in grid:
+                    reach[steps + 1].add(pos + d)
+        if (steps - (grid_len // 2) + 1) % grid_len == 0:
+            pts.append(len(reach[max(reach.keys())]))
+
+    c = pts[0]
+    b = pts[1] - pts[0]
+    a = pts[2] - pts[1]
+
+    x = target_time // grid_len # remainder is already in the euqtion
+    print(grid_len//2)
+    print(target_time%grid_len)
+    assert grid_len // 2 == target_time%grid_len
+
+    return (c + b * x + (x * (x - 1) // 2) * (a - b))
+    # 620962518745459
+
 def solve(input):
     with open(input) as f:
         lines = f.read().splitlines()
@@ -87,11 +139,8 @@ def solve(input):
     p1, p2 = 0, 0
     start_node = [(r,c) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if lines[r][c] == "S"][0]
 
-
-    for l in range(100,103):
-        v1 = len(finder(lines, start_node, l, True))
-        v2 = len(finder(lines, start_node, l, True))
-        print("Item {} is {} v {}".format(l,v1,v2))
+    # v1 = len(finder(lines, start_node, l*131+65))
+    # print("Item {} is {}".format(l,v1))
     # l = 100
     # result = finder(lines, start_node, l)
     # count_blocks = 0
@@ -120,24 +169,24 @@ def solve(input):
     # print(500, len(finder(lines, start_node, 500)), timer()-start)
 
 
-    return 0,0
-    # p1 = len(finder(lines, start_node, 64))
+
+    p1 = len(finder(lines, start_node, 64))
     # p2 = finder(lines, start_node, 100)
+    p2 = part2()
 
 
-    for i in range(101, 200, 2):
-        tmp = int(i/len(lines))+1
-        print("{}:".format(i))
-        tmp_points = finder(lines, start_node, i)
-        for r_offset in range(-tmp,tmp+1):
-            for c_offset in range(-tmp,tmp+1):
-                all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
-                print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
-            print()
-        print()
+    # for i in range(101, 200, 2):
+    #     tmp = int(i/len(lines))+1
+    #     print("{}:".format(i))
+    #     tmp_points = finder(lines, start_node, i)
+    #     for r_offset in range(-tmp,tmp+1):
+    #         for c_offset in range(-tmp,tmp+1):
+    #             all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
+    #             print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
+    #         print()
+    #     print()
 
 
-    p2 = len(p2)
     #  3113198559 (too low)
     # min_r = min([r for r,c in p2])
     # max_r = max([r for r,c in p2])
