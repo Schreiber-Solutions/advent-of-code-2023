@@ -69,14 +69,20 @@ def solve(input):
     while open_list:
         # print(open_list)
         m = open_list.pop()
-        for j1 in [j for j in junctions if j != m[0] and j not in [closed_item[0] for closed_item in closed_list]]:
-            result = find_short_path(j1, m[0], lines)
+        for j1 in [j for j in junctions if j != m[0]]:
+            # print("Trying {}->{}".format(j1, m[0]))
+            if (m[0],j1) in paths:
+                result = paths[(m[0],j1)]
+            else:
+                result = find_long_path(lines, j1, m[0],[j for j in junctions if j not in (j1,m[0])])
+            # if result:
+            #     print("Path found {}->{}: {} with {} junctions".format(m[0], j1, len(result), [p for p in result if p in junctions]))
             # direct path without intermediate junctions
             if result and sum([1 for p in result if p in junctions]) == 2:
                 paths[(m[0],j1)] = result
                 paths[(j1,m[0])] = result
                 open_list.add((j1, *m))
-                print("{}->{}: {}".format(m[0],j1,result))
+                # print("Non-junction path {}->{}: {}".format(m[0],j1,result))
         closed_list.add(m)
 
     print("result {}".format([c for c in closed_list if c[0]==end_node]))
@@ -156,7 +162,7 @@ def find_short_path(start_node, end_node, lines):
     else:
         return None
 
-def find_long_path(end_node, lines, start_node):
+def find_long_path(lines, start_node, end_node, exclude):
     open_list = [(start_node,)]
     closed_list = set()
     max_len = 0
@@ -178,28 +184,30 @@ def find_long_path(end_node, lines, start_node):
                 open_list.remove(m)
 
             for (dr, dc) in dirs:
-                if get_grid(lines, mr + dr, mc + dc) != "#":
-                    # print("{} neighbor {}".format(m[0],(mr+dr,mc+dc)))
-                    if (mr + dr, mc + dc) == end_node:
-                        if len(m) > max_len:
-                            closed_list.add(((mr + dr, mc + dc), *m))
-                            max_len = len(m)
-                            # print_path(lines, m)
-                        print("Found end node with length {} ({} - {} open, {} closed)".format(len(m), max_len,
-                                                                                               len(open_list),
-                                                                                               len(closed_list)))
+                if (mr+dr,mc+dc) not in exclude:
+                    if get_grid(lines, mr + dr, mc + dc) != "#":
+                        # print("{} neighbor {}".format(m[0],(mr+dr,mc+dc)))
+                        if (mr + dr, mc + dc) == end_node:
+                            if len(m) > max_len:
+                                closed_list.add(((mr + dr, mc + dc), *m))
+                                max_len = len(m)
+                                # print_path(lines, m)
 
-                        p2_max_len = max([len(c) for c in closed_list if c[0] == end_node])
-                        p2 = [c for c in closed_list if c[0] == end_node and len(c) == p2_max_len][0]
-                    else:
-                        if all([(mr + dr, mc + dc) not in p for p in all_m]) and m == long_m:
-                            open_list.append(((mr + dr, mc + dc), *m))
-                        elif (mr + dr, mc + dc) not in m:
-                            open_list.append(((mr + dr, mc + dc), *m))
+                        else:
+                            if all([(mr + dr, mc + dc) not in p for p in all_m]) and m == long_m:
+                                open_list.append(((mr + dr, mc + dc), *m))
+                            elif (mr + dr, mc + dc) not in m:
+                                open_list.append(((mr + dr, mc + dc), *m))
 
             # for o in open_list:
             #     print(o)
-    return closed_list
+    result = [len(c) for c in closed_list if c[0] == end_node]
+    if not result:
+        return None
+    p2_max_len = max(result)
+    p2 = [c for c in closed_list if c[0] == end_node and len(c) == p2_max_len][0]
+
+    return p2
 
 
 def print_path(lines, p2):
