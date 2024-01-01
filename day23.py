@@ -115,7 +115,6 @@ def find_neighbors(grid, start_node, end_node):
             for (dr, dc) in dirs:
                 if m not in closed_list and get_grid(grid, mr + dr, mc + dc) != "#":
                     open_list.append((mr+dr,mc+dc))
-                    # parent[(mr+dr,mc+dc)] = m
                     distance[(mr+dr,mc+dc)] = distance[m] + 1
 
             closed_list.add(m)
