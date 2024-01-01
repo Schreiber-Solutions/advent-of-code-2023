@@ -22,16 +22,15 @@ def solve(input):
 
     start_node = [(0,c) for c, col in enumerate(lines[0]) if col == "."][0]
     end_node = [(len(lines)-1,c) for c, col in enumerate(lines[len(lines)-1]) if col == "."][0]
-    print(end_node)
+
     open_list = { start_node }
     visited = { start_node: 0 }
     path = {start_node: [] }
 
     while open_list:
         m = open_list.pop()
-        # print(path)
         mr, mc = m
-        # print(open_list)
+
         for (dr, dc) in [d for index, d in enumerate(dirs) if hills[index] == get_grid(lines, *m) or get_grid(lines, *m) == '.']:
             if get_grid(lines, mr+dr, mc+dc) != "#":
                 # print("{} neighbor {}".format(m,(mr+dr,mc+dc)))
@@ -48,69 +47,40 @@ def solve(input):
 
     p = path[end_node]
     p.reverse()
-    print(len(p))
+
     p1 = visited[end_node]
 
     # reversed
     start_node = [(0,c) for c, col in enumerate(lines[0]) if col == "."][0]
     end_node = [(len(lines)-1,c) for c, col in enumerate(lines[len(lines)-1]) if col == "."][0]
 
-    # junctions = [start_node]
-    # for r, row in enumerate(lines):
-    #     for c, item in enumerate(row):
-    #         if item != '#' and sum([1 for (dr,dc) in dirs if get_grid(lines, r+dr, c+dc) != '#']) > 2:
-    #             junctions.append((r,c))
-    # junctions.append(end_node)
-    # print("Junctions {}".format(junctions))
-
-    open_list = [ (start_node, ) ]
-    parent = { start_node: None }
+    # open_list = [ (start_node, ) ]
+    open_list = deque()
     visited = { (start_node, ): 0 }
     closed_list = set()
     max_len = 0
+    open_list.append((start_node, ))
 
     while open_list:
-        open_list.sort(key=lambda elem: visited[elem] + s.distance(elem[0],end_node), reverse=True)
-        m = open_list.pop(0)
-        neighbors = find_neighbors(lines, m[0], end_node)
-        # neighbors = list(neighbors)
-        # neighbors.sort(key=lambda elem: elem[1] + s.distance(elem[0],end_node), reverse=True)
-        for (j1, distance) in neighbors:
-            if j1 not in m:
-                # if max_len > 6222:
-                #     short_path = find_short_path(j1,end_node, lines, list(m))
-                #     print("Short path:",short_path)
-                #     if short_path is not None:
-                #         open_list.append((j1, *m))
+        # open_list.sort(key=lambda elem: visited[elem] + s.distance(elem[0],end_node), reverse=True)
+        m = open_list.pop()
 
-                # else:
-                open_list.append((j1, *m))
+        if m[0] == end_node:
+            closed_list.add(m)
+            if visited[m] > max_len:
+                max_len = visited[m]
 
-                if (j1, *m) in visited and visited[(j1, *m)] < visited[m] + distance:
-                    visited[(j1, *m)] = visited[m] + distance
-                    print("Never gets here")
-                elif (j1, *m) not in visited:
+        else:
+            neighbors = find_neighbors(lines, m[0], end_node)
+            for (j1, distance) in neighbors:
+
+                if j1 not in m:
+                    open_list.append((j1, *m))
                     visited[(j1, *m)] = visited[m] + distance
 
-            if j1 == end_node:
-                if (j1, *m) in visited and visited[(j1, *m)] < visited[m] + distance:
-                    visited[(j1, *m)] = visited[m] + distance
-
-                elif (j1, *m) not in visited:
-                    visited[(j1, *m)] = visited[m] + distance
-
-                closed_list.add((j1, *m))
-                if visited[m] + distance > max_len:
-                    max_len = visited[m] + distance
-                    print("max_len = ", max_len)
-                    # print("open ", len(open_list))
-                    # print("closed", len(closed_list))
-
-    # print("Done", closed_list)
-
-    path = [k for k, d in visited.items() if d == max(visited.values())]
+    path = [k for k, d in visited.items() if d == max_len]
     if len(path) > 0:
-        print("Longest path", [k for k, d in visited.items() if d == max(visited.values())])
+        # print("Longest path", path)
         p2 = max_len
     else:
         p2 = 0
@@ -131,7 +101,7 @@ def find_neighbors(grid, start_node, end_node):
     closed_list = set()
     neighbor = set()
     distance = { start_node: 0 }
-    parent = {start_node: start_node }
+    # parent = {start_node: start_node }
 
     while open_list:
         m = open_list.pop()
@@ -145,7 +115,7 @@ def find_neighbors(grid, start_node, end_node):
             for (dr, dc) in dirs:
                 if m not in closed_list and get_grid(grid, mr + dr, mc + dc) != "#":
                     open_list.append((mr+dr,mc+dc))
-                    parent[(mr+dr,mc+dc)] = m
+                    # parent[(mr+dr,mc+dc)] = m
                     distance[(mr+dr,mc+dc)] = distance[m] + 1
 
             closed_list.add(m)
@@ -156,101 +126,101 @@ def find_neighbors(grid, start_node, end_node):
     return neighbor
 
 
-def find_short_path(start_node, end_node, lines, exclude = []):
-    open_list = [(start_node,)]
-    closed_list = set()
-    max_len = 1000000
-
-    if end_node == start_node:
-        return []
-
-    while open_list:
-        # open_list.sort(reverse=True, key=by_len)
-        open_list.sort(key=lambda elem: by_len(elem) + s.distance(elem[0], end_node))
-        m = open_list.pop(0)
-
-        mr, mc = m[0]
-        # print(len(open_list))
-
-        all_m = [m, *[p for p in open_list if p[0] == m]]
-        long_m = max([len(p) for p in all_m])
-        long_m = [p for p in all_m if len(p) == long_m][0]
-
-        for m in all_m:
-            if m in open_list:
-                open_list.remove(m)
-
-            for (dr, dc) in dirs:
-                if (mr+dr, mc+dc) not in exclude:
-                    if get_grid(lines, mr + dr, mc + dc) != "#":
-                        if (mr + dr, mc + dc) == end_node:
-                            if len(m) < max_len:
-                                closed_list.add(((mr + dr, mc + dc), *m))
-                                max_len = len(m)
-
-                        else:
-                            if len(m)+1 < max_len:
-                                if all([(mr + dr, mc + dc) not in p for p in all_m]) and m == long_m:
-                                    open_list.append(((mr + dr, mc + dc), *m))
-                                elif (mr + dr, mc + dc) not in m:
-                                    open_list.append(((mr + dr, mc + dc), *m))
-
-    retval = [len(c) for c in closed_list if c[0] == end_node]
-    if len(retval) > 0:
-        min_len = min(retval)
-        retval = [c for c in closed_list if c[0] == end_node and len(c) == min_len]
-
-        return s.reverse_list(retval[0])
-    else:
-        return None
-
-def find_long_path(lines, start_node, end_node, exclude):
-    open_list = [(start_node,)]
-    closed_list = set()
-    max_len = 0
-    p2 = []
-    while open_list:
-        # open_list.sort(reverse=True, key=by_len)
-        open_list.sort(reverse=True, key=lambda elem: by_len(elem) + s.distance(elem[0], end_node))
-        m = open_list.pop(0)
-
-        mr, mc = m[0]
-        # print(len(open_list))
-
-        all_m = [m, *[p for p in open_list if p[0] == m]]
-        long_m = max([len(p) for p in all_m])
-        long_m = [p for p in all_m if len(p) == long_m][0]
-
-        for m in all_m:
-            if m in open_list:
-                open_list.remove(m)
-
-            for (dr, dc) in dirs:
-                if (mr+dr,mc+dc) not in exclude:
-                    if get_grid(lines, mr + dr, mc + dc) != "#":
-                        # print("{} neighbor {}".format(m[0],(mr+dr,mc+dc)))
-                        if (mr + dr, mc + dc) == end_node:
-                            if len(m) > max_len:
-                                closed_list.add(((mr + dr, mc + dc), *m))
-                                max_len = len(m)
-                                # print_path(lines, m)
-
-                        else:
-                            if all([(mr + dr, mc + dc) not in p for p in all_m]) and m == long_m:
-                                open_list.append(((mr + dr, mc + dc), *m))
-                            elif (mr + dr, mc + dc) not in m:
-                                open_list.append(((mr + dr, mc + dc), *m))
-
-            # for o in open_list:
-            #     print(o)
-    result = [len(c) for c in closed_list if c[0] == end_node]
-    if not result:
-        return None
-    p2_max_len = max(result)
-    p2 = [c for c in closed_list if c[0] == end_node and len(c) == p2_max_len][0]
-
-    return p2
-
+# def find_short_path(start_node, end_node, lines, exclude = []):
+#     open_list = [(start_node,)]
+#     closed_list = set()
+#     max_len = 1000000
+#
+#     if end_node == start_node:
+#         return []
+#
+#     while open_list:
+#         # open_list.sort(reverse=True, key=by_len)
+#         open_list.sort(key=lambda elem: by_len(elem) + s.distance(elem[0], end_node))
+#         m = open_list.pop(0)
+#
+#         mr, mc = m[0]
+#         # print(len(open_list))
+#
+#         all_m = [m, *[p for p in open_list if p[0] == m]]
+#         long_m = max([len(p) for p in all_m])
+#         long_m = [p for p in all_m if len(p) == long_m][0]
+#
+#         for m in all_m:
+#             if m in open_list:
+#                 open_list.remove(m)
+#
+#             for (dr, dc) in dirs:
+#                 if (mr+dr, mc+dc) not in exclude:
+#                     if get_grid(lines, mr + dr, mc + dc) != "#":
+#                         if (mr + dr, mc + dc) == end_node:
+#                             if len(m) < max_len:
+#                                 closed_list.add(((mr + dr, mc + dc), *m))
+#                                 max_len = len(m)
+#
+#                         else:
+#                             if len(m)+1 < max_len:
+#                                 if all([(mr + dr, mc + dc) not in p for p in all_m]) and m == long_m:
+#                                     open_list.append(((mr + dr, mc + dc), *m))
+#                                 elif (mr + dr, mc + dc) not in m:
+#                                     open_list.append(((mr + dr, mc + dc), *m))
+#
+#     retval = [len(c) for c in closed_list if c[0] == end_node]
+#     if len(retval) > 0:
+#         min_len = min(retval)
+#         retval = [c for c in closed_list if c[0] == end_node and len(c) == min_len]
+#
+#         return s.reverse_list(retval[0])
+#     else:
+#         return None
+#
+# def find_long_path(lines, start_node, end_node, exclude):
+#     open_list = [(start_node,)]
+#     closed_list = set()
+#     max_len = 0
+#     p2 = []
+#     while open_list:
+#         # open_list.sort(reverse=True, key=by_len)
+#         open_list.sort(reverse=True, key=lambda elem: by_len(elem) + s.distance(elem[0], end_node))
+#         m = open_list.pop(0)
+#
+#         mr, mc = m[0]
+#         # print(len(open_list))
+#
+#         all_m = [m, *[p for p in open_list if p[0] == m]]
+#         long_m = max([len(p) for p in all_m])
+#         long_m = [p for p in all_m if len(p) == long_m][0]
+#
+#         for m in all_m:
+#             if m in open_list:
+#                 open_list.remove(m)
+#
+#             for (dr, dc) in dirs:
+#                 if (mr+dr,mc+dc) not in exclude:
+#                     if get_grid(lines, mr + dr, mc + dc) != "#":
+#                         # print("{} neighbor {}".format(m[0],(mr+dr,mc+dc)))
+#                         if (mr + dr, mc + dc) == end_node:
+#                             if len(m) > max_len:
+#                                 closed_list.add(((mr + dr, mc + dc), *m))
+#                                 max_len = len(m)
+#                                 # print_path(lines, m)
+#
+#                         else:
+#                             if all([(mr + dr, mc + dc) not in p for p in all_m]) and m == long_m:
+#                                 open_list.append(((mr + dr, mc + dc), *m))
+#                             elif (mr + dr, mc + dc) not in m:
+#                                 open_list.append(((mr + dr, mc + dc), *m))
+#
+#             # for o in open_list:
+#             #     print(o)
+#     result = [len(c) for c in closed_list if c[0] == end_node]
+#     if not result:
+#         return None
+#     p2_max_len = max(result)
+#     p2 = [c for c in closed_list if c[0] == end_node and len(c) == p2_max_len][0]
+#
+#     return p2
+#
 
 def print_path(lines, p2):
     for r in range(len(lines)):
