@@ -20,23 +20,9 @@ cache = {}
 
 
 def finder(grid, start, length, use_cache=True):
-    open = { (start) }
+    open = { start }
     visited = {start: 0}
     points = set()
-
-    if (start, length) in cache.keys() and use_cache:
-        points, visited = cache[(start,length)]
-        return points
-
-    # if use_cache:
-    #     options = [k[1] for k in cache.keys() if k[0] == start and k[1] < length and k[1] % 2 == length % 2]
-    #     if options:
-    #         # print("Found options {},{} for {}".format(start, length, options))
-    #         points, visited = cache[(start,max(options))]
-    #         # print("Visited for {},{} len {} is {}".format(start, max(options), len(visited), visited))
-    #         open = {v for v in visited if visited[v] == max(visited.values())}
-    #         # print("Starting with points {}, len {}".format(points, len(points)))
-    #         # print("Open ", open)
 
     if length == 0:
         return points
@@ -44,93 +30,26 @@ def finder(grid, start, length, use_cache=True):
     while open:
         m = open.pop()
         mr, mc = m
+
+
         for dr, dc in dirs:
-            if mr+dr < 0 or mr+dr >= len(grid) or mc+dc < 0 or mc+dc >= len(grid[0]):
-                tmp = ((mr+dr) % len(grid), (mc+dc) % len(grid[0]))
-                tmp_length = length - visited[(mr,mc)] - 1
-                if tmp_length > 0:
-                    # print("{} -> {} with length {}".format((mr+dr, mc+dc), tmp, tmp_length))
-                    offset_r = mr+dr-tmp[0]
-                    offset_c = mc+dc-tmp[1]
-                    if grid_get(grid, *tmp) != "#":
-                        beyond = [(offset_r+p[0],offset_c+p[1]) for p in finder(grid, tmp, tmp_length, use_cache)]
-                        # print("beyond {}".format([b for b in beyond if b not in points]))
-                        points.update(beyond)
+            nr = (mr + dr) % len(grid)
+            nc = (mc + dc) % len(grid[0])
+            if grid_get(grid, nr, nc) != "#":
 
-                    # if (visited[(mr, mc)] + 1) % 2 == length % 2:
-                    #     points.add((mr + dr, mc + dc))
-
-            elif grid_get(grid, mr + dr, mc + dc) != "#" and visited[(mr,mc)] + 1 <= length:
-                # if int((visited[(mr,mc)] + 1) / 100) ==(visited[(mr,mc)] + 1) / 100:
-                #     print((visited[(mr,mc)] + 1))
-
-                if (mr+dr, mc+dc) not in visited:
-                    open.add((mr+dr, mc+dc))
-                    visited[(mr+dr, mc+dc)] = visited[(mr,mc)] + 1
-                else:
-                    if visited[(mr+dr, mc+dc)] > visited[(mr,mc)] + 1:
-                        visited[(mr + dr, mc + dc)] = visited[(mr, mc)] + 1
+                if visited[(mr, mc)] <= length:
+                    if (mr+dr,mc+dc) not in visited:
                         open.add((mr + dr, mc + dc))
+                        visited[(mr + dr, mc + dc)] = visited[(mr, mc)]+1
+                    elif visited[(mr + dr, mc + dc)] > visited[(mr,mc)] + 1:
+                        open.add((mr + dr, mc + dc))
+                        visited[(mr + dr, mc + dc)] = visited[(mr, mc)] + 1
 
-                if (visited[(mr, mc)] + 1) % 2 == length % 2:
-                    points.add((mr+dr, mc + dc))
-
-    # print(points)
-    cache[(start,length)] = [points, visited]
+                    if (visited[(mr, mc)]+1) % 2 == length % 2:
+                        points.add((mr+dr,mc+dc))
 
     return points
 
-def part2():
-    grid = set()
-    free = set()
-
-    x = 0
-    for y, l in enumerate(open("data/day21_input.txt")):
-        for x, c in enumerate(l):
-            if c == "#":
-                grid.add(x + y * 1j)
-            elif c == "S":
-                start = x + y * 1j
-            elif c == ".":
-                free.add(x + y * 1j)
-
-    deltas = [1, -1, -1j, 1j]
-
-    reach = {0: set([start])}
-
-    grid_len = x + 1
-
-    pts = []
-    target_time = 26501365
-    while len(pts) < 3:
-        steps = max(reach.keys())
-
-        if steps - 1 in reach:
-            del reach[steps - 1]
-
-        reach[steps + 1] = set()
-
-        for pos in reach[steps]:
-            for d in deltas:
-                npt = pos + d
-                nx = npt.real % grid_len
-                ny = npt.imag % grid_len
-                if nx + ny * 1j not in grid:
-                    reach[steps + 1].add(pos + d)
-        if (steps - (grid_len // 2) + 1) % grid_len == 0:
-            pts.append(len(reach[max(reach.keys())]))
-
-    c = pts[0]
-    b = pts[1] - pts[0]
-    a = pts[2] - pts[1]
-
-    x = target_time // grid_len # remainder is already in the euqtion
-    print(grid_len//2)
-    print(target_time%grid_len)
-    assert grid_len // 2 == target_time%grid_len
-
-    return (c + b * x + (x * (x - 1) // 2) * (a - b))
-    # 620962518745459
 
 def solve(input):
     with open(input) as f:
@@ -138,30 +57,7 @@ def solve(input):
 
     p1, p2 = 0, 0
     start_node = [(r,c) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if lines[r][c] == "S"][0]
-
-    # v1 = len(finder(lines, start_node, l*131+65))
-    # print("Item {} is {}".format(l,v1))
-    # l = 100
-    # result = finder(lines, start_node, l)
-    # count_blocks = 0
-    # spaces = 0
-    # start = (5,5)
-    # for r in range(start[0]-l, start[0]+l+1):
-    #     for c in range(start[1]-l, start[1]+l+1):
-    #         if s.distance((r,c),start) <= l:
-    #             if (r,c) in result:
-    #                 print("O", end="")
-    #             else:
-    #                 print(lines[r % len(lines)][c % len(lines[0])], end="")
-    #             if (r+c) % 2 == l % 2:
-    #                 if lines[r % len(lines)][c % len(lines[0])] == "#":
-    #                     count_blocks += 1
-    #                 spaces += 1
-    #         else:
-    #             print(" ", end="")
-    #     print()
-    # print("total = {}, Blocks = {}, result = {}".format(spaces, count_blocks, len(result)-1))
-
+    p1 = len(finder(lines, start_node, 64))
     start = timer()
     # print(6, len(finder(lines, start_node, 6)), timer()-start)
     # print(10, len(finder(lines, start_node, 10)), timer()-start)
@@ -170,40 +66,45 @@ def solve(input):
 
 
 
-    p1 = len(finder(lines, start_node, 64))
-    # p2 = finder(lines, start_node, 100)
-    p2 = part2()
+    target = 26501365
+    sequence = []
+    for i in [len(lines)//2, len(lines)+len(lines)//2, 2*len(lines)+len(lines)//2]:
+        tmp = i//len(lines)+1
 
+        tmp_points = finder(lines, start_node, i)
+        for r_offset in range(-tmp,tmp+1):
+            for c_offset in range(-tmp,tmp+1):
+                all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
+                print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
+            print()
 
-    # for i in range(101, 200, 2):
-    #     tmp = int(i/len(lines))+1
-    #     print("{}:".format(i))
-    #     tmp_points = finder(lines, start_node, i)
-    #     for r_offset in range(-tmp,tmp+1):
-    #         for c_offset in range(-tmp,tmp+1):
-    #             all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
-    #             print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
-    #         print()
-    #     print()
+        sequence.append(len(tmp_points))
+        print(i,len(tmp_points))
 
+    grid_len = len(lines)
+    units = target // grid_len
 
-    #  3113198559 (too low)
-    # min_r = min([r for r,c in p2])
-    # max_r = max([r for r,c in p2])
-    # min_c = min([c for r,c in p2])
-    # max_c = max([c for r,c in p2])
-    #
-    # for r in range(min_r, max_r+1):
-    #     for c in range(min_c, max_c+1):
-    #         if (r,c) == start_node:
-    #             print("S", end="")
-    #         elif (r,c) in p2:
-    #             print("O", end="")
-    #         else:
-    #             print(lines[r % len(lines)][c % len(lines[0])], end="")
-    #     print()
+    p2 = sequence[0] + \
+         (sequence[1] - sequence[0]) * units + \
+         (sequence[2] - 2*sequence[1] + sequence[0]) * ((units * (units - 1)) // 2)
 
     return p1, p2
+
+
+def print_tiles(lines, p2, start_node):
+    min_r = min([r for r, c in p2])
+    max_r = max([r for r, c in p2])
+    min_c = min([c for r, c in p2])
+    max_c = max([c for r, c in p2])
+    for r in range(min_r, max_r + 1):
+        for c in range(min_c, max_c + 1):
+            if (r, c) == start_node:
+                print("S", end="")
+            elif (r, c) in p2:
+                print("O", end="")
+            else:
+                print(lines[r % len(lines)][c % len(lines[0])], end="")
+        print()
 
 
 if __name__ == '__main__':
@@ -216,6 +117,7 @@ if __name__ == '__main__':
     print("{} part 1: {}".format(d,p1))
     print("{} part 2: {}".format(d,p2))
     print("Elapsed {}".format(timer()-start))
+    assert p2 == 620962518745459
     # lst = [1, 4, 4, 4, 2, 5, 6, 6, 7, 8, 9, 10]
     # print(s.find_most_frequent(lst))
     # print(s.find_occurances(lst)[4])
