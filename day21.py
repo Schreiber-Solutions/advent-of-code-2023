@@ -3,6 +3,10 @@ import scrib as s
 import os
 from collections import namedtuple
 from timeit import default_timer as timer
+import pandas as pd
+import matplotlib.pyplot as pt
+import numpy as np
+
 
 dirs = [(1,0), (0,1), (-1,0), (0,-1)]
 def grid_get(grid, r, c):
@@ -67,26 +71,37 @@ def solve(input):
 
 
     target = 26501365
+    assert target % len(lines) == len(lines) // 2
     sequence = []
-    for i in [len(lines)//2, len(lines)+len(lines)//2, 2*len(lines)+len(lines)//2]:
+    # periodicity on the i*grid_len+grid_len//2 as target % grid_len == grid_len // 2
+    unit_list = [0, 1, 2, 3, 4, 5, 6]
+    for unit in unit_list:
+
+        i = unit*len(lines)+len(lines)//2
         tmp = i//len(lines)+1
 
         tmp_points = finder(lines, start_node, i)
-        for r_offset in range(-tmp,tmp+1):
-            for c_offset in range(-tmp,tmp+1):
-                all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
-                print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
-            print()
+        # for r_offset in range(-tmp,tmp+1):
+        #     for c_offset in range(-tmp,tmp+1):
+        #         all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
+                # print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
+            # print()
 
         sequence.append(len(tmp_points))
-        print(i,len(tmp_points))
+        # print(i,len(tmp_points))
 
     grid_len = len(lines)
     units = target // grid_len
 
-    p2 = sequence[0] + \
-         (sequence[1] - sequence[0]) * units + \
-         (sequence[2] - 2*sequence[1] + sequence[0]) * ((units * (units - 1)) // 2)
+    # p2 = sequence[0] + \
+    #      (sequence[1] - sequence[0]) * units + \
+    #      (sequence[2] - 2*sequence[1] + sequence[0]) * ((units * (units - 1)) // 2)
+
+    df = pd.DataFrame({'x': [*unit_list ], 'y': [*sequence] } )
+    # curve fit
+    model = np.poly1d(np.polyfit(df.x, df.y, 2))
+    print(model)
+    p2 = sequence[0] + int(model[1])*units + int(model[2])*units**2
 
     return p1, p2
 
