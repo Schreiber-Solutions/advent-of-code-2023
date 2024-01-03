@@ -74,7 +74,7 @@ def solve(input):
     assert target % len(lines) == len(lines) // 2
     sequence = []
     # periodicity on the i*grid_len+grid_len//2 as target % grid_len == grid_len // 2
-    unit_list = [0, 1, 2]
+    unit_list = [0, 1, 2, 3]
     for unit in unit_list:
 
         i = unit*len(lines)+len(lines)//2
@@ -106,12 +106,22 @@ def solve(input):
     a = (sequence[2] - 2 * sequence[1] + sequence[0]) / 2
     b = sequence[1] - a - sequence[0]
 
-
-    # df = pd.DataFrame({'x': [*unit_list ], 'y': [*sequence] } )
-    # curve fit
-    # model = np.poly1d(np.polyfit(df.x, df.y, 2))
-
     p2 = a*units**2 + b*units + c
+
+    # x = []
+    # y = []
+    # for l in range(len(lines)//2, len(lines)*5, len(lines)//2):
+    #     tmp_points = finder(lines, start_node, l)
+    #     x.append(l)
+    #     y.append(len(tmp_points))
+
+    # df = pd.DataFrame({'x': [*x ], 'y': [*y] } )
+    # # curve fit
+    # fit = np.polyfit(df.x, df.y, 2, full=True)
+    # model = np.poly1d(np.polyfit(df.x, df.y, 2))
+    # print(model)
+    # print(fit)
+
 
     return p1, p2
 
