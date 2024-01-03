@@ -74,7 +74,7 @@ def solve(input):
     assert target % len(lines) == len(lines) // 2
     sequence = []
     # periodicity on the i*grid_len+grid_len//2 as target % grid_len == grid_len // 2
-    unit_list = [0, 1, 2, 3, 4, 5, 6]
+    unit_list = [0, 1, 2]
     for unit in unit_list:
 
         i = unit*len(lines)+len(lines)//2
@@ -84,8 +84,8 @@ def solve(input):
         # for r_offset in range(-tmp,tmp+1):
         #     for c_offset in range(-tmp,tmp+1):
         #         all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
-                # print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
-            # print()
+        #         print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
+        #     print()
 
         sequence.append(len(tmp_points))
         # print(i,len(tmp_points))
@@ -93,15 +93,25 @@ def solve(input):
     grid_len = len(lines)
     units = target // grid_len
 
-    # p2 = sequence[0] + \
-    #      (sequence[1] - sequence[0]) * units + \
-    #      (sequence[2] - 2*sequence[1] + sequence[0]) * ((units * (units - 1)) // 2)
+    # tiles = a*units**2 + b*units + c
+    # c = sequence[0]
+    # sequence[1] = a + b + c
+    # b = sequence[1] - a - sequence[0]
+    # sequence[2] = 4*a + 2*b + c
+    # s[2] = 4*a + 2*s[1] - 2*a - s[0]
+    # 2*a = s[2] - 2*s[1] + s[0]
+    # a = (sequence[2] - 2*sequence[1] + sequence[0] ) / 2
 
-    df = pd.DataFrame({'x': [*unit_list ], 'y': [*sequence] } )
+    c = sequence[0]
+    a = (sequence[2] - 2 * sequence[1] + sequence[0]) / 2
+    b = sequence[1] - a - sequence[0]
+
+
+    # df = pd.DataFrame({'x': [*unit_list ], 'y': [*sequence] } )
     # curve fit
-    model = np.poly1d(np.polyfit(df.x, df.y, 2))
-    print(model)
-    p2 = sequence[0] + int(model[1])*units + int(model[2])*units**2
+    # model = np.poly1d(np.polyfit(df.x, df.y, 2))
+
+    p2 = a*units**2 + b*units + c
 
     return p1, p2
 
