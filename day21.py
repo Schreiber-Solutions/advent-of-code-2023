@@ -74,18 +74,19 @@ def solve(input):
     assert target % len(lines) == len(lines) // 2
     sequence = []
     # periodicity on the i*grid_len+grid_len//2 as target % grid_len == grid_len // 2
-    unit_list = [0, 1, 2, 3]
+    unit_list = [0, 1, 2, 3, 4]
     for unit in unit_list:
 
         i = unit*len(lines)+len(lines)//2
         tmp = i//len(lines)+1
+        print("grids ", tmp)
 
         tmp_points = finder(lines, start_node, i)
-        # for r_offset in range(-tmp,tmp+1):
-        #     for c_offset in range(-tmp,tmp+1):
-        #         all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
-        #         print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
-        #     print()
+        for r_offset in range(-tmp,tmp+1):
+            for c_offset in range(-tmp,tmp+1):
+                all_points_rc = [(r+r_offset*len(lines),c+c_offset*len(lines[0])) for r, row in enumerate(lines) for c, col in enumerate(lines[r]) if c != "#"]
+                print("{:>8}\t\t".format(len([p for p in all_points_rc if p  in tmp_points])), end="")
+            print()
 
         sequence.append(len(tmp_points))
         # print(i,len(tmp_points))
@@ -115,13 +116,13 @@ def solve(input):
     #     x.append(l)
     #     y.append(len(tmp_points))
 
-    # df = pd.DataFrame({'x': [*x ], 'y': [*y] } )
-    # # curve fit
-    # fit = np.polyfit(df.x, df.y, 2, full=True)
-    # model = np.poly1d(np.polyfit(df.x, df.y, 2))
-    # print(model)
-    # print(fit)
-
+    df = pd.DataFrame({'x': [*unit_list ], 'y': [*sequence] } )
+    # curve fit
+    fit = np.polyfit(df.x, df.y, 2, full=True)
+    model = np.poly1d(np.polyfit(df.x, df.y, 2))
+    print(model)
+    print(fit)
+    print(model(target//len(lines)))
 
     return p1, p2
 
